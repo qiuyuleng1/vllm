@@ -17,8 +17,6 @@ from vllm.entrypoints.openai.protocol import (
 )
 from vllm.outputs import RequestOutput
 from vllm.entrypoints.openai.serving_engine import OpenAIServing, LoRA
-from vllm.model_executor.guided_decoding import (
-    get_guided_decoding_logits_processor)
 
 logger = init_logger(__name__)
 
@@ -125,14 +123,14 @@ class OpenAIServingCompletion(OpenAIServing):
         try:
             sampling_params = request.to_sampling_params()
             lora_request = self._maybe_get_lora(request)
-            guided_decode_logit_processor = (
-                await get_guided_decoding_logits_processor(
-                    request, await self.engine.get_tokenizer()))
-            if guided_decode_logit_processor is not None:
-                if sampling_params.logits_processors is None:
-                    sampling_params.logits_processors = []
-                sampling_params.logits_processors.append(
-                    guided_decode_logit_processor)
+            # guided_decode_logit_processor = (
+            #     await get_guided_decoding_logits_processor(
+            #         request, await self.engine.get_tokenizer()))
+            # if guided_decode_logit_processor is not None:
+            #     if sampling_params.logits_processors is None:
+            #         sampling_params.logits_processors = []
+            #     sampling_params.logits_processors.append(
+            #         guided_decode_logit_processor)
             prompt_is_tokens, prompts = parse_prompt_format(request.prompt)
 
             for i, prompt in enumerate(prompts):

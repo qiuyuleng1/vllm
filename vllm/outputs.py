@@ -3,7 +3,6 @@ import time
 
 from vllm.sequence import (PromptLogprobs, SampleLogprobs, SequenceGroup,
                            SequenceStatus, RequestMetrics)
-from vllm.lora.request import LoRARequest
 
 
 class CompletionOutput:
@@ -29,7 +28,7 @@ class CompletionOutput:
         cumulative_logprob: float,
         logprobs: Optional[SampleLogprobs],
         finish_reason: Optional[str] = None,
-        lora_request: Optional[LoRARequest] = None,
+        lora_request = None,
     ) -> None:
         self.index = index
         self.text = text
@@ -74,7 +73,7 @@ class RequestOutput:
         outputs: List[CompletionOutput],
         finished: bool,
         metrics: Optional[RequestMetrics] = None,
-        lora_request: Optional[LoRARequest] = None,
+        lora_request  = None,
     ) -> None:
         self.request_id = request_id
         self.prompt = prompt

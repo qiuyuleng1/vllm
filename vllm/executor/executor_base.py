@@ -2,8 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, List, Optional
 
 from vllm.config import (CacheConfig, DeviceConfig, ModelConfig,
-                         ParallelConfig, SchedulerConfig, LoRAConfig)
-from vllm.lora.request import LoRARequest
+                         ParallelConfig, SchedulerConfig)
 from vllm.sequence import SamplerOutput, SequenceGroupMetadata
 
 
@@ -23,7 +22,7 @@ class ExecutorBase(ABC):
         parallel_config: ParallelConfig,
         scheduler_config: SchedulerConfig,
         device_config: DeviceConfig,
-        lora_config: Optional[LoRAConfig],
+        lora_config = None,
     ) -> None:
         raise NotImplementedError
 
@@ -37,7 +36,7 @@ class ExecutorBase(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def add_lora(self, lora_request: LoRARequest) -> bool:
+    def add_lora(self, lora_request) -> bool:
         raise NotImplementedError
 
     @abstractmethod

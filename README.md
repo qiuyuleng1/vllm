@@ -1,3 +1,22 @@
+This is a fork of vLLM to support xfastertransformer backend.  
+`pip install -e .` to install or `python3 setup.py bdist_wheel --verbose` build wheel package.  
+***Distributed is not support yet.(WIP)***  
+**Continuous batching is not supported, so the scheduling strategy has also been modified. Only after the previous batch of requests has been processed will new requests be handled.**
+### example
+run `examples/offline_xfastertransformer.py`  
+model to config xft model directory and tokenizer to config huggingface model directory.
+
+### openai.api
+```
+python -m vllm.entrypoints.openai.api_server \
+        --model /data/chatglm3-6b-xft/ --port 8000 \
+        --tokenizer "/data/chatglm3-6b-hf/ " \
+        --trust-remote-code \
+        --xft_dtype "bf16"
+```
+
+**Lora and beamsearch is not supported.**
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/vllm-project/vllm/main/docs/source/assets/logos/vllm-logo-text-dark.png">

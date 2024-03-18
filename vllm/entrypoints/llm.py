@@ -3,7 +3,6 @@ from typing import List, Optional, Union
 from tqdm import tqdm
 from transformers import PreTrainedTokenizer, PreTrainedTokenizerFast
 
-from vllm.lora.request import LoRARequest
 from vllm.engine.arg_utils import EngineArgs
 from vllm.engine.llm_engine import LLMEngine
 from vllm.outputs import RequestOutput
@@ -125,7 +124,7 @@ class LLM:
         sampling_params: Optional[SamplingParams] = None,
         prompt_token_ids: Optional[List[List[int]]] = None,
         use_tqdm: bool = True,
-        lora_request: Optional[LoRARequest] = None,
+        lora_request = None,
     ) -> List[RequestOutput]:
         """Generates the completions for the input prompts.
 
@@ -170,7 +169,7 @@ class LLM:
             self._add_request(prompt,
                               sampling_params,
                               token_ids,
-                              lora_request=lora_request)
+                              lora_request=None)
         return self._run_engine(use_tqdm)
 
     def _add_request(
@@ -178,14 +177,14 @@ class LLM:
         prompt: Optional[str],
         sampling_params: SamplingParams,
         prompt_token_ids: Optional[List[int]],
-        lora_request: Optional[LoRARequest] = None,
+        lora_request = None,
     ) -> None:
         request_id = str(next(self.request_counter))
         self.llm_engine.add_request(request_id,
                                     prompt,
                                     sampling_params,
                                     prompt_token_ids,
-                                    lora_request=lora_request)
+                                    lora_request=None)
 
     def _run_engine(self, use_tqdm: bool) -> List[RequestOutput]:
         # Initialize tqdm.

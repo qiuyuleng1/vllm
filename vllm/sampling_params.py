@@ -152,6 +152,7 @@ class SamplingParams:
         self.include_stop_str_in_output = include_stop_str_in_output
         self._verify_args()
         if self.use_beam_search:
+            raise ValueError("Beam search is not supported yet.")
             self._verify_beam_search()
         else:
             self._verify_non_beam_search()
@@ -163,8 +164,8 @@ class SamplingParams:
                 self._verify_greedy_sampling()
 
     def _verify_args(self) -> None:
-        if self.n < 1:
-            raise ValueError(f"n must be at least 1, got {self.n}.")
+        if self.n != 1:
+            raise ValueError(f"n must be 1, got {self.n}.")
         if self.best_of < self.n:
             raise ValueError(f"best_of must be greater than or equal to n, "
                              f"got n={self.n} and best_of={self.best_of}.")
@@ -191,11 +192,11 @@ class SamplingParams:
         if self.max_tokens is not None and self.max_tokens < 1:
             raise ValueError(
                 f"max_tokens must be at least 1, got {self.max_tokens}.")
-        if self.logprobs is not None and self.logprobs < 0:
+        if self.logprobs is not None:
             raise ValueError(
-                f"logprobs must be non-negative, got {self.logprobs}.")
-        if self.prompt_logprobs is not None and self.prompt_logprobs < 0:
-            raise ValueError(f"prompt_logprobs must be non-negative, got "
+                f"logprobs must be None, got {self.logprobs}.")
+        if self.prompt_logprobs is not None:
+            raise ValueError(f"prompt_logprobs must be None, got "
                              f"{self.prompt_logprobs}.")
 
     def _verify_beam_search(self) -> None:

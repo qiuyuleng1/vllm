@@ -4,8 +4,24 @@ from dataclasses import dataclass
 from typing import Optional, Tuple
 
 from vllm.config import (CacheConfig, DeviceConfig, ModelConfig,
-                         ParallelConfig, SchedulerConfig, LoRAConfig)
+                         ParallelConfig, SchedulerConfig)
 
+DTYPE_LIST = [
+    "fp16",
+    "bf16",
+    "int8",
+    "w8a8",
+    "int4",
+    "nf4",
+    "bf16_fp16",
+    "bf16_int8",
+    "bf16_w8a8",
+    "bf16_int4",
+    "bf16_nf4",
+    "w8a8_int8",
+    "w8a8_int4",
+    "w8a8_nf4",
+]
 
 @dataclass
 class EngineArgs:
@@ -15,7 +31,7 @@ class EngineArgs:
     tokenizer_mode: str = 'auto'
     trust_remote_code: bool = False
     download_dir: Optional[str] = None
-    load_format: str = 'auto'
+    load_format: str = 'xft'
     dtype: str = 'auto'
     kv_cache_dtype: str = 'auto'
     seed: int = 0
@@ -48,6 +64,7 @@ class EngineArgs:
     max_cpu_loras: Optional[int] = None
     device: str = 'auto'
     ray_workers_use_nsight: bool = False
+    xft_dtype: str = 'fp16'
 
     def __post_init__(self):
         if self.tokenizer is None:
@@ -113,7 +130,7 @@ class EngineArgs:
             '--load-format',
             type=str,
             default=EngineArgs.load_format,
-            choices=['auto', 'pt', 'safetensors', 'npcache', 'dummy'],
+            choices=['auto', 'pt', 'safetensors', 'npcache', 'dummy', 'xft'],
             help='The format of the model weights to load. '
             '"auto" will try to load the weights in the safetensors format '
             'and fall back to the pytorch bin format if safetensors format '
@@ -135,6 +152,12 @@ class EngineArgs:
             'The "auto" option will use FP16 precision '
             'for FP32 and FP16 models, and BF16 precision '
             'for BF16 models.')
+        parser.add_argument(
+            '--xft_dtype',
+            type=str,
+            default=EngineArgs.xft_dtype,
+            choices=DTYPE_LIST,
+            help='data type for xft')
         parser.add_argument(
             '--kv-cache-dtype',
             type=str,
@@ -300,7 +323,7 @@ class EngineArgs:
     def create_engine_configs(
         self,
     ) -> Tuple[ModelConfig, CacheConfig, ParallelConfig, SchedulerConfig,
-               DeviceConfig, Optional[LoRAConfig]]:
+               DeviceConfig, None]:
         device_config = DeviceConfig(self.device)
         model_config = ModelConfig(
             self.model, self.tokenizer, self.tokenizer_mode,
@@ -324,13 +347,7 @@ class EngineArgs:
                                            self.max_num_seqs,
                                            model_config.max_model_len,
                                            self.max_paddings)
-        lora_config = LoRAConfig(
-            max_lora_rank=self.max_lora_rank,
-            max_loras=self.max_loras,
-            lora_extra_vocab_size=self.lora_extra_vocab_size,
-            lora_dtype=self.lora_dtype,
-            max_cpu_loras=self.max_cpu_loras if self.max_cpu_loras
-            and self.max_cpu_loras > 0 else None) if self.enable_lora else None
+        lora_config = None
         return (model_config, cache_config, parallel_config, scheduler_config,
                 device_config, lora_config)
 

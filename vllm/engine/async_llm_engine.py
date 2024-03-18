@@ -7,11 +7,9 @@ from typing import (Callable, Dict, Iterable, List, Optional, Set, Tuple, Type,
 
 from transformers import PreTrainedTokenizer
 
-from vllm.lora.request import LoRARequest
 from vllm.config import ModelConfig
 from vllm.engine.arg_utils import AsyncEngineArgs
 from vllm.engine.llm_engine import LLMEngine
-from vllm.engine.ray_utils import initialize_ray_cluster, ray
 from vllm.logger import init_logger
 from vllm.outputs import RequestOutput
 from vllm.sampling_params import SamplingParams
@@ -222,7 +220,7 @@ class _AsyncLLMEngine(LLMEngine):
         request_id: str,  # pylint: disable=unused-argument
         prompt: Optional[str],
         prompt_token_ids: Optional[List[int]] = None,
-        lora_request: Optional[LoRARequest] = None,
+        lora_request = None,
     ):
         if prompt_token_ids is None:
             assert prompt is not None
@@ -239,7 +237,7 @@ class _AsyncLLMEngine(LLMEngine):
         sampling_params: SamplingParams,
         prompt_token_ids: Optional[List[int]] = None,
         arrival_time: Optional[float] = None,
-        lora_request: Optional[LoRARequest] = None,
+        lora_request = None,
     ) -> None:
         if lora_request is not None and not self.lora_config:
             raise ValueError(f"Got lora_request {lora_request} but LoRA is "
@@ -325,15 +323,12 @@ class AsyncLLMEngine:
         # Create the engine configs.
         engine_configs = engine_args.create_engine_configs()
         parallel_config = engine_configs[2]
-        if parallel_config.worker_use_ray or engine_args.engine_use_ray:
-            initialize_ray_cluster(parallel_config)
-            from vllm.executor.ray_gpu_executor import RayGPUExecutorAsync
-            executor_class = RayGPUExecutorAsync
-        else:
-            assert parallel_config.world_size == 1, (
-                "Ray is required if parallel_config.world_size > 1.")
-            from vllm.executor.gpu_executor import GPUExecutorAsync
-            executor_class = GPUExecutorAsync
+
+        # Initialize the cluster and specify the executor class.
+        assert parallel_config.world_size == 1, ("parallel_config.world_size should be 1.")
+        from vllm.executor.cpu_executor import CPUExecutorAsync
+        executor_class = CPUExecutorAsync
+        
         # Create the async LLM engine.
         engine = cls(parallel_config.worker_use_ray,
                      engine_args.engine_use_ray,
@@ -390,22 +385,8 @@ class AsyncLLMEngine:
         self.background_loop = asyncio.shield(self._background_loop_unshielded)
 
     def _init_engine(self, *args,
-                     **kwargs) -> Union[_AsyncLLMEngine, "ray.ObjectRef"]:
-        if not self.engine_use_ray:
-            engine_class = self._engine_class
-        elif self.worker_use_ray:
-            engine_class = ray.remote(num_cpus=0)(self._engine_class).remote
-        else:
-            # FIXME(woosuk): This is a bit hacky. Be careful when changing the
-            # order of the arguments.
-            cache_config = args[1]
-            parallel_config = args[2]
-            if parallel_config.tensor_parallel_size == 1:
-                num_gpus = cache_config.gpu_memory_utilization
-            else:
-                num_gpus = 1
-            engine_class = ray.remote(num_gpus=num_gpus)(
-                self._engine_class).remote
+                     **kwargs) -> Union[_AsyncLLMEngine]:
+        engine_class = self._engine_class
         return engine_class(*args, **kwargs)
 
     async def engine_step(self) -> bool:
@@ -480,7 +461,7 @@ class AsyncLLMEngine:
         sampling_params: SamplingParams,
         prompt_token_ids: Optional[List[int]] = None,
         arrival_time: Optional[float] = None,
-        lora_request: Optional[LoRARequest] = None,
+        lora_request = None,
     ) -> AsyncStream:
         if self.log_requests:
             shortened_prompt = prompt
@@ -510,18 +491,11 @@ class AsyncLLMEngine:
         if arrival_time is None:
             arrival_time = time.time()
 
-        if self.engine_use_ray:
-            prompt_token_ids = await self.engine.encode_request_async.remote(
-                request_id=request_id,
-                prompt=prompt,
-                prompt_token_ids=prompt_token_ids,
-                lora_request=lora_request)
-        else:
-            prompt_token_ids = await self.engine.encode_request_async(
-                request_id=request_id,
-                prompt=prompt,
-                prompt_token_ids=prompt_token_ids,
-                lora_request=lora_request)
+        prompt_token_ids = await self.engine.encode_request_async(
+            request_id=request_id,
+            prompt=prompt,
+            prompt_token_ids=prompt_token_ids,
+            lora_request=lora_request)
 
         stream = self._request_tracker.add_request(
             request_id,
@@ -539,7 +513,7 @@ class AsyncLLMEngine:
         sampling_params: SamplingParams,
         request_id: str,
         prompt_token_ids: Optional[List[int]] = None,
-        lora_request: Optional[LoRARequest] = None,
+        lora_request = None,
     ) -> AsyncIterator[RequestOutput]:
         """Generate outputs for a request.
 
@@ -674,12 +648,5 @@ class AsyncLLMEngine:
         logger.debug("Starting health check...")
         if self.is_stopped:
             raise AsyncEngineDeadError("Background loop is stopped.")
-
-        if self.engine_use_ray:
-            try:
-                await self.engine.check_health.remote()
-            except ray.exceptions.RayActorError as e:
-                raise RuntimeError("Engine is dead.") from e
-        else:
-            await self.engine.check_health_async()
+        await self.engine.check_health_async()
         logger.debug(f"Health check took {time.perf_counter()-t}s")

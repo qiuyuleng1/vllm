@@ -11,7 +11,6 @@ from vllm.entrypoints.openai.protocol import (CompletionRequest,
                                               ErrorResponse, LogProbs,
                                               ModelCard, ModelList,
                                               ModelPermission)
-from vllm.lora.request import LoRARequest
 from vllm.sequence import Logprob
 
 logger = init_logger(__name__)
@@ -31,16 +30,7 @@ class OpenAIServing:
                  lora_modules=Optional[List[LoRA]]):
         self.engine = engine
         self.served_model = served_model
-        if lora_modules is None:
-            self.lora_requests = []
-        else:
-            self.lora_requests = [
-                LoRARequest(
-                    lora_name=lora.name,
-                    lora_int_id=i,
-                    lora_local_path=lora.local_path,
-                ) for i, lora in enumerate(lora_modules, start=1)
-            ]
+        self.lora_requests = []
 
         self.max_model_len = 0
         self.tokenizer = None
@@ -151,7 +141,7 @@ class OpenAIServing:
             err_type="NotFoundError",
             status_code=HTTPStatus.NOT_FOUND)
 
-    def _maybe_get_lora(self, request) -> Optional[LoRARequest]:
+    def _maybe_get_lora(self, request):
         if request.model == self.served_model:
             return
         for lora in self.lora_requests:

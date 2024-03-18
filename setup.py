@@ -390,23 +390,23 @@ def find_version(filepath: str) -> str:
 def get_vllm_version() -> str:
     version = find_version(get_path("vllm", "__init__.py"))
 
-    if _is_hip():
-        # Get the HIP version
-        hipcc_version = get_hipcc_rocm_version()
-        if hipcc_version != MAIN_CUDA_VERSION:
-            rocm_version_str = hipcc_version.replace(".", "")[:3]
-            version += f"+rocm{rocm_version_str}"
-    elif _is_neuron():
-        # Get the Neuron version
-        neuron_version = str(neuronxcc_version)
-        if neuron_version != MAIN_CUDA_VERSION:
-            neuron_version_str = neuron_version.replace(".", "")[:3]
-            version += f"+neuron{neuron_version_str}"
-    else:
-        cuda_version = str(nvcc_cuda_version)
-        if cuda_version != MAIN_CUDA_VERSION:
-            cuda_version_str = cuda_version.replace(".", "")[:3]
-            version += f"+cu{cuda_version_str}"
+    # if _is_hip():
+    #     # Get the HIP version
+    #     hipcc_version = get_hipcc_rocm_version()
+    #     if hipcc_version != MAIN_CUDA_VERSION:
+    #         rocm_version_str = hipcc_version.replace(".", "")[:3]
+    #         version += f"+rocm{rocm_version_str}"
+    # elif _is_neuron():
+    #     # Get the Neuron version
+    #     neuron_version = str(neuronxcc_version)
+    #     if neuron_version != MAIN_CUDA_VERSION:
+    #         neuron_version_str = neuron_version.replace(".", "")[:3]
+    #         version += f"+neuron{neuron_version_str}"
+    # else:
+    #     cuda_version = str(nvcc_cuda_version)
+    #     if cuda_version != MAIN_CUDA_VERSION:
+    #         cuda_version_str = cuda_version.replace(".", "")[:3]
+    #         version += f"+cu{cuda_version_str}"
 
     return version
 
@@ -431,12 +431,12 @@ def get_requirements() -> List[str]:
     else:
         with open(get_path("requirements.txt")) as f:
             requirements = f.read().strip().split("\n")
-        if nvcc_cuda_version <= Version("11.8"):
-            # replace cupy-cuda12x with cupy-cuda11x for cuda 11.x
-            for i in range(len(requirements)):
-                if requirements[i].startswith("cupy-cuda12x"):
-                    requirements[i] = "cupy-cuda11x"
-                    break
+        # if nvcc_cuda_version <= Version("11.8"):
+        #     # replace cupy-cuda12x with cupy-cuda11x for cuda 11.x
+        #     for i in range(len(requirements)):
+        #         if requirements[i].startswith("cupy-cuda12x"):
+        #             requirements[i] = "cupy-cuda11x"
+        #             break
     return requirements
 
 
@@ -473,7 +473,7 @@ setuptools.setup(
                                                "examples", "tests")),
     python_requires=">=3.8",
     install_requires=get_requirements(),
-    ext_modules=ext_modules,
-    cmdclass={"build_ext": BuildExtension} if not _is_neuron() else {},
+    # ext_modules=ext_modules,
+    # cmdclass={"build_ext": BuildExtension} if not _is_neuron() else {},
     package_data=package_data,
 )

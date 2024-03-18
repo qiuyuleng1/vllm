@@ -4,14 +4,12 @@ from typing import Dict, Iterable, List, Optional, Tuple, Type, Union
 from transformers import PreTrainedTokenizer
 
 import vllm
-from vllm.lora.request import LoRARequest
 from vllm.config import (CacheConfig, DeviceConfig, ModelConfig,
-                         ParallelConfig, SchedulerConfig, LoRAConfig)
+                         ParallelConfig, SchedulerConfig)
 from vllm.core.scheduler import Scheduler, SchedulerOutputs
 from vllm.engine.arg_utils import EngineArgs
 from vllm.executor.executor_base import ExecutorBase
 from vllm.engine.metrics import StatLogger, Stats
-from vllm.engine.ray_utils import initialize_ray_cluster
 from vllm.logger import init_logger
 from vllm.outputs import RequestOutput
 from vllm.sampling_params import SamplingParams
@@ -60,7 +58,7 @@ class LLMEngine:
         parallel_config: ParallelConfig,
         scheduler_config: SchedulerConfig,
         device_config: DeviceConfig,
-        lora_config: Optional[LoRAConfig],
+        lora_config,
         executor_class: Type[ExecutorBase],
         log_stats: bool,
     ) -> None:
@@ -73,6 +71,7 @@ class LLMEngine:
             f"tokenizer_revision={model_config.tokenizer_revision}, "
             f"trust_remote_code={model_config.trust_remote_code}, "
             f"dtype={model_config.dtype}, "
+            f"xft_dtype={model_config.xft_dtype}, "
             f"max_seq_len={model_config.max_model_len}, "
             f"download_dir={model_config.download_dir!r}, "
             f"load_format={model_config.load_format}, "
@@ -88,7 +87,10 @@ class LLMEngine:
 
         self.model_config = model_config
         self.cache_config = cache_config
-        self.lora_config = lora_config
+        if lora_config is not None:
+            raise RuntimeError("xFasterTransfomrer doesn't supporte Lora yet.")
+        self.lora_config = None
+
         self.parallel_config = parallel_config
         self.scheduler_config = scheduler_config
         self.device_config = device_config
@@ -118,20 +120,15 @@ class LLMEngine:
     def from_engine_args(cls, engine_args: EngineArgs) -> "LLMEngine":
         """Creates an LLM engine from the engine arguments."""
         # Create the engine configs.
+        # configs
         engine_configs = engine_args.create_engine_configs()
         parallel_config = engine_configs[2]
 
         # Initialize the cluster and specify the executor class.
-        if parallel_config.worker_use_ray:
-            initialize_ray_cluster(parallel_config)
-            from vllm.executor.ray_gpu_executor import RayGPUExecutor
-            executor_class = RayGPUExecutor
-        else:
-            assert parallel_config.world_size == 1, (
-                "Ray is required if parallel_config.world_size > 1.")
-            from vllm.executor.gpu_executor import GPUExecutor
-            executor_class = GPUExecutor
-
+        assert parallel_config.world_size == 1, ("parallel_config.world_size should be 1.")
+        from vllm.executor.cpu_executor import CPUExecutor
+        executor_class = CPUExecutor
+        
         # Create the LLM engine.
         engine = cls(*engine_configs,
                      executor_class=executor_class,
@@ -159,29 +156,27 @@ class LLMEngine:
             trust_remote_code=self.model_config.trust_remote_code,
             revision=self.model_config.tokenizer_revision)
         init_kwargs.update(tokenizer_init_kwargs)
+
         self.tokenizer: TokenizerGroup = TokenizerGroup(
             self.model_config.tokenizer, **init_kwargs)
 
     def _verify_args(self) -> None:
-        self.model_config.verify_with_parallel_config(self.parallel_config)
-        self.cache_config.verify_with_parallel_config(self.parallel_config)
-        if self.lora_config:
-            self.lora_config.verify_with_model_config(self.model_config)
-            self.lora_config.verify_with_scheduler_config(
-                self.scheduler_config)
+        # self.model_config.verify_with_parallel_config(self.parallel_config)
+        # self.cache_config.verify_with_parallel_config(self.parallel_config)
+        pass
 
     def encode_request(
         self,
         request_id: str,  # pylint: disable=unused-argument
         prompt: Optional[str],
         prompt_token_ids: Optional[List[int]] = None,
-        lora_request: Optional[LoRARequest] = None,
+        lora_request = None,
     ):
         if prompt_token_ids is None:
             assert prompt is not None
             prompt_token_ids = self.tokenizer.encode(request_id=request_id,
                                                      prompt=prompt,
-                                                     lora_request=lora_request)
+                                                     lora_request=None)
         return prompt_token_ids
 
     def add_request(
@@ -191,7 +186,7 @@ class LLMEngine:
         sampling_params: SamplingParams,
         prompt_token_ids: Optional[List[int]] = None,
         arrival_time: Optional[float] = None,
-        lora_request: Optional[LoRARequest] = None,
+        lora_request=None,
     ) -> None:
         """Add a request to the engine's request pool.
 
@@ -233,6 +228,7 @@ class LLMEngine:
             >>> # continue the request processing
             >>> ...
         """
+        lora_request = None
         if lora_request is not None and not self.lora_config:
             raise ValueError(f"Got lora_request {lora_request} but LoRA is "
                              "not enabled!")
@@ -301,6 +297,7 @@ class LLMEngine:
         """Returns True if there are unfinished requests."""
         return self.scheduler.has_unfinished_seqs()
 
+    # TODO:disable
     def _check_beam_search_early_stopping(
         self,
         early_stopping: Union[bool, str],
@@ -349,18 +346,19 @@ class LLMEngine:
                                         outputs: SequenceGroupOutput) -> None:
 
         # Process prompt logprobs
-        prompt_logprobs = outputs.prompt_logprobs
-        if prompt_logprobs is not None:
-            # We can pick any sequence for the prompt.
-            seq = next(iter(seq_group.seqs_dict.values()))
-            all_token_ids = seq.get_token_ids()
-            for i, prompt_logprobs_for_token in enumerate(prompt_logprobs):
-                self._decode_logprobs(seq, seq_group.sampling_params,
-                                      prompt_logprobs_for_token,
-                                      all_token_ids[:i])
-            seq_group.prompt_logprobs = prompt_logprobs
+        # prompt_logprobs = outputs.prompt_logprobs
+        # if prompt_logprobs is not None:
+        #     # We can pick any sequence for the prompt.
+        #     seq = next(iter(seq_group.seqs_dict.values()))
+        #     all_token_ids = seq.get_token_ids()
+        #     for i, prompt_logprobs_for_token in enumerate(prompt_logprobs):
+        #         self._decode_logprobs(seq, seq_group.sampling_params,
+        #                               prompt_logprobs_for_token,
+        #                               all_token_ids[:i])
+        #     seq_group.prompt_logprobs = prompt_logprobs
 
         # Process samples
+        is_done:bool = outputs.is_done
         samples = outputs.samples
         parent_seqs = seq_group.get_seqs(status=SequenceStatus.RUNNING)
         existing_finished_seqs = seq_group.get_finished_seqs()
@@ -384,6 +382,7 @@ class LLMEngine:
                 parent.status = SequenceStatus.FINISHED_ABORTED
                 seq_group.remove(parent.seq_id)
                 self.scheduler.free_seq(parent)
+                raise RuntimeError("Each parent sample should have child.")
                 continue
             # Fork the parent sequence if there are multiple child samples.
             for child_sample in child_samples[:-1]:
@@ -398,6 +397,7 @@ class LLMEngine:
             last_child_sample = child_samples[-1]
             parent.append_token_id(last_child_sample.output_token,
                                    last_child_sample.logprobs)
+            parent.is_done = is_done
             child_seqs.append((parent, parent))
 
         for seq, _ in child_seqs:
@@ -631,9 +631,9 @@ class LLMEngine:
         now = time.monotonic()
 
         # KV Cache Usage in %.
-        num_total_gpu = self.cache_config.num_gpu_blocks
-        num_free_gpu = self.scheduler.block_manager.get_num_free_gpu_blocks()
-        gpu_cache_usage = 1.0 - (num_free_gpu / num_total_gpu)
+        # num_total_gpu = self.cache_config.num_gpu_blocks
+        # num_free_gpu = self.scheduler.block_manager.get_num_free_gpu_blocks()
+        gpu_cache_usage = 0.0
 
         num_total_cpu = self.cache_config.num_cpu_blocks
         cpu_cache_usage = 0.
@@ -742,34 +742,38 @@ class LLMEngine:
 
     def _check_stop(self, seq: Sequence,
                     sampling_params: SamplingParams) -> None:
-        """Stop the finished sequences."""
-        for stop_str in sampling_params.stop:
-            if seq.output_text.endswith(stop_str):
-                self._finalize_sequence(seq, sampling_params, stop_str)
-                seq.status = SequenceStatus.FINISHED_STOPPED
-                return
-        if seq.get_last_token_id() in sampling_params.stop_token_ids:
-            stop_str = self.get_tokenizer_for_seq(seq).convert_ids_to_tokens(
-                seq.get_last_token_id())
-            self._finalize_sequence(seq, sampling_params, stop_str)
+        if seq.is_done:
+            # self._finalize_sequence(seq, sampling_params, stop_str)
             seq.status = SequenceStatus.FINISHED_STOPPED
             return
+        # """Stop the finished sequences."""
+        # for stop_str in sampling_params.stop:
+        #     if seq.output_text.endswith(stop_str):
+        #         self._finalize_sequence(seq, sampling_params, stop_str)
+        #         seq.status = SequenceStatus.FINISHED_STOPPED
+        #         return
+        # if seq.get_last_token_id() in sampling_params.stop_token_ids:
+        #     stop_str = self.get_tokenizer_for_seq(seq).convert_ids_to_tokens(
+        #         seq.get_last_token_id())
+        #     self._finalize_sequence(seq, sampling_params, stop_str)
+        #     seq.status = SequenceStatus.FINISHED_STOPPED
+        #     return
 
-        # Check if the sequence has reached max_model_len.
-        if seq.get_len() > self.scheduler_config.max_model_len:
-            seq.status = SequenceStatus.FINISHED_LENGTH_CAPPED
-            return
+        # # Check if the sequence has reached max_model_len.
+        # if seq.get_len() > self.scheduler_config.max_model_len:
+        #     seq.status = SequenceStatus.FINISHED_LENGTH_CAPPED
+        #     return
 
-        # Check if the sequence has reached max_tokens.
-        if seq.get_output_len() == sampling_params.max_tokens:
-            seq.status = SequenceStatus.FINISHED_LENGTH_CAPPED
-            return
+        # # Check if the sequence has reached max_tokens.
+        # if seq.get_output_len() == sampling_params.max_tokens:
+        #     seq.status = SequenceStatus.FINISHED_LENGTH_CAPPED
+        #     return
 
-        # Check if the sequence has generated the EOS token.
-        if ((not sampling_params.ignore_eos)
-                and seq.get_last_token_id() == seq.eos_token_id):
-            seq.status = SequenceStatus.FINISHED_STOPPED
-            return
+        # # Check if the sequence has generated the EOS token.
+        # if ((not sampling_params.ignore_eos)
+        #         and seq.get_last_token_id() == seq.eos_token_id):
+        #     seq.status = SequenceStatus.FINISHED_STOPPED
+        #     return
 
     def _finalize_sequence(self, seq: Sequence,
                            sampling_params: SamplingParams,
@@ -782,7 +786,7 @@ class LLMEngine:
             # not included in the output.
             seq.output_text = seq.output_text[:-len(stop_string)]
 
-    def add_lora(self, lora_request: LoRARequest) -> bool:
+    def add_lora(self, lora_request) -> bool:
         return self.model_executor.add_lora(lora_request)
 
     def remove_lora(self, lora_id: int) -> bool:
