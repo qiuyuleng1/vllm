@@ -340,34 +340,34 @@ vllm_extension_sources = [
     "csrc/pybind.cpp",
 ]
 
-if _is_cuda():
-    vllm_extension_sources.append("csrc/quantization/awq/gemm_kernels.cu")
-    vllm_extension_sources.append(
-        "csrc/quantization/marlin/marlin_cuda_kernel.cu")
-    vllm_extension_sources.append("csrc/custom_all_reduce.cu")
+# if _is_cuda():
+#     vllm_extension_sources.append("csrc/quantization/awq/gemm_kernels.cu")
+#     vllm_extension_sources.append(
+#         "csrc/quantization/marlin/marlin_cuda_kernel.cu")
+#     vllm_extension_sources.append("csrc/custom_all_reduce.cu")
 
-    # Add MoE kernels.
-    ext_modules.append(
-        CUDAExtension(
-            name="vllm._moe_C",
-            sources=glob("csrc/moe/*.cu") + glob("csrc/moe/*.cpp"),
-            extra_compile_args={
-                "cxx": CXX_FLAGS,
-                "nvcc": NVCC_FLAGS,
-            },
-        ))
+#     # Add MoE kernels.
+#     ext_modules.append(
+#         CUDAExtension(
+#             name="vllm._moe_C",
+#             sources=glob("csrc/moe/*.cu") + glob("csrc/moe/*.cpp"),
+#             extra_compile_args={
+#                 "cxx": CXX_FLAGS,
+#                 "nvcc": NVCC_FLAGS,
+#             },
+#         ))
 
-if not _is_neuron():
-    vllm_extension = CUDAExtension(
-        name="vllm._C",
-        sources=vllm_extension_sources,
-        extra_compile_args={
-            "cxx": CXX_FLAGS,
-            "nvcc": NVCC_FLAGS,
-        },
-        libraries=["cuda"] if _is_cuda() else [],
-    )
-    ext_modules.append(vllm_extension)
+# if not _is_neuron():
+#     vllm_extension = CUDAExtension(
+#         name="vllm._C",
+#         sources=vllm_extension_sources,
+#         extra_compile_args={
+#             "cxx": CXX_FLAGS,
+#             "nvcc": NVCC_FLAGS,
+#         },
+#         libraries=["cuda"] if _is_cuda() else [],
+#     )
+#     ext_modules.append(vllm_extension)
 
 
 def get_path(*filepath) -> str:
