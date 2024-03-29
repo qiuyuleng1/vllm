@@ -448,7 +448,7 @@ if os.environ.get("VLLM_USE_PRECOMPILED"):
     package_data["vllm"].append("*.so")
 
 setuptools.setup(
-    name="vllm",
+    name="vllm-xft",
     version=get_vllm_version(),
     author="vLLM Team",
     license="Apache 2.0",
