@@ -22,7 +22,7 @@ def main(args: argparse.Namespace):
         quantization=args.quantization,
         tensor_parallel_size=args.tensor_parallel_size,
         trust_remote_code=args.trust_remote_code,
-        dtype=args.dtype,
+        xft_dtype=args.dtype,
         enforce_eager=args.enforce_eager,
         kv_cache_dtype=args.kv_cache_dtype,
         device=args.device,
@@ -115,7 +115,7 @@ if __name__ == '__main__':
         '--dtype',
         type=str,
         default='auto',
-        choices=['auto', 'half', 'float16', 'bfloat16', 'float', 'float32'],
+        choices=['auto', 'half', 'float16', 'bfloat16', 'float', 'float32','bf16'],
         help='data type for model weights and activations. '
         'The "auto" option will use FP16 precision '
         'for FP32 and FP16 models, and BF16 precision '

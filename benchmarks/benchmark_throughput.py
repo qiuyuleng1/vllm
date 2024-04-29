@@ -83,7 +83,7 @@ def run_vllm(
               tensor_parallel_size=tensor_parallel_size,
               seed=seed,
               trust_remote_code=trust_remote_code,
-              dtype=dtype,
+              xft_dtype=dtype,
               max_model_len=max_model_len,
               gpu_memory_utilization=gpu_memory_utilization,
               enforce_eager=enforce_eager,
@@ -283,7 +283,7 @@ if __name__ == "__main__":
         '--dtype',
         type=str,
         default='auto',
-        choices=['auto', 'half', 'float16', 'bfloat16', 'float', 'float32'],
+        choices=['auto', 'half', 'float16', 'bfloat16', 'float', 'float32', 'bf16'],
         help='data type for model weights and activations. '
         'The "auto" option will use FP16 precision '
         'for FP32 and FP16 models, and BF16 precision '
