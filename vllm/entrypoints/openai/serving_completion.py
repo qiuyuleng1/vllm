@@ -122,6 +122,9 @@ class OpenAIServingCompletion(OpenAIServing):
         generators = []
         try:
             sampling_params = request.to_sampling_params()
+
+            sampling_params.stop_token_ids.extend(self.engine.engine.default_stop_ids)
+
             lora_request = self._maybe_get_lora(request)
             # guided_decode_logit_processor = (
             #     await get_guided_decoding_logits_processor(

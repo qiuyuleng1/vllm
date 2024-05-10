@@ -73,6 +73,8 @@ class OpenAIServingChat(OpenAIServing):
             #         guided_decode_logits_processor)
         except ValueError as e:
             return self.create_error_response(str(e))
+        
+        sampling_params.stop_token_ids.extend(self.engine.engine.default_stop_ids)
 
         result_generator = self.engine.generate(prompt, sampling_params,
                                                 request_id, token_ids,

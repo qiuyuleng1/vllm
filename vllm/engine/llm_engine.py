@@ -100,6 +100,24 @@ class LLMEngine:
         self._init_tokenizer()
         self.seq_counter = Counter()
 
+        self.default_stop_ids = []
+        tokenizer = self.get_tokenizer()
+        stop_words_list = [
+            "<|end_of_text|>",
+            "<|eot_id|>",
+            "<|im_end|>",
+            "<|endoftext|>",
+        ]
+
+        special_tokens_dict = {'additional_special_tokens': []}
+        for stop_word in stop_words_list:
+            sopt_word_token_id = tokenizer.encode(stop_word)
+            if len(sopt_word_token_id) == 1:
+                self.default_stop_ids.append(sopt_word_token_id)
+                special_tokens_dict["additional_special_tokens"].append(stop_word)
+        tokenizer.add_special_tokens(special_tokens_dict)
+
+
         self.model_executor = executor_class(model_config, cache_config,
                                              parallel_config, scheduler_config,
                                              device_config, lora_config)
@@ -128,7 +146,7 @@ class LLMEngine:
         assert parallel_config.world_size == 1, ("parallel_config.world_size should be 1.")
         from vllm.executor.cpu_executor import CPUExecutor
         executor_class = CPUExecutor
-        
+
         # Create the LLM engine.
         engine = cls(*engine_configs,
                      executor_class=executor_class,
