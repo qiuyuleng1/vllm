@@ -1,5 +1,7 @@
 This is a fork of vLLM to support xfastertransformer backend.  
-`python3 setup.py bdist_wheel --verbose` to build wheel package.  
+# Install 
+Install from PyPI by `pip install vllm-xft`  
+~~`python3 setup.py bdist_wheel --verbose` to build wheel package.~~  
 ***Distributed is not support yet.(WIP)***  
 **Continuous batching is not supported, so the scheduling strategy has also been modified. Only after the previous batch of requests has been processed will new requests be handled.**
 ### example
