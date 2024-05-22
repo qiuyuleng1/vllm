@@ -169,7 +169,7 @@ class LLMEngine:
             load_config=load_config,
         )
 
-        self._initialize_kv_caches()
+        # self._initialize_kv_caches()
 
         # If usage stat is enabled, collect relevant info.
         if is_usage_stats_enabled():
@@ -259,7 +259,7 @@ class LLMEngine:
         self.cache_config.num_gpu_blocks = num_gpu_blocks
         self.cache_config.num_cpu_blocks = num_cpu_blocks
 
-        self.model_executor.initialize_cache(num_gpu_blocks, num_cpu_blocks)
+        # self.model_executor.initialize_cache(num_gpu_blocks, num_cpu_blocks)
 
     @classmethod
     def from_engine_args(
@@ -272,7 +272,10 @@ class LLMEngine:
         engine_config = engine_args.create_engine_config()
 
         # Initialize the cluster and specify the executor class.
-        if engine_config.device_config.device_type == "neuron":
+        if True:
+            from vllm.executor.cpu_executor import CPUExecutor
+            executor_class = CPUExecutor
+        elif engine_config.device_config.device_type == "neuron":
             from vllm.executor.neuron_executor import NeuronExecutor
             executor_class = NeuronExecutor
         elif engine_config.device_config.device_type == "cpu":
@@ -516,7 +519,9 @@ class LLMEngine:
                 self.output_processor.process_outputs(seq_group, outputs)
 
         # Free the finished sequence groups.
-        self.scheduler.free_finished_seq_groups()
+        free_xft_seq_ids = self.scheduler.free_finished_seq_groups()
+        self.model_executor.free_xft_cache(free_xft_seq_ids)
+        
 
         # Create the outputs.
         request_outputs: List[RequestOutput] = []
@@ -636,16 +641,16 @@ class LLMEngine:
         num_waiting_sys = len(self.scheduler.waiting)
 
         # KV Cache Usage in %
-        num_total_gpu = self.cache_config.num_gpu_blocks
-        num_free_gpu = self.scheduler.block_manager.get_num_free_gpu_blocks()
-        gpu_cache_usage_sys = 1.0 - (num_free_gpu / num_total_gpu)
+        # num_total_gpu = self.cache_config.num_gpu_blocks
+        # num_free_gpu = self.scheduler.block_manager.get_num_free_gpu_blocks()
+        gpu_cache_usage_sys = 0.
 
-        num_total_cpu = self.cache_config.num_cpu_blocks
+        # num_total_cpu = self.cache_config.num_cpu_blocks
         cpu_cache_usage_sys = 0.
-        if num_total_cpu > 0:
-            num_free_cpu = self.scheduler.block_manager.get_num_free_cpu_blocks(
-            )
-            cpu_cache_usage_sys = 1.0 - (num_free_cpu / num_total_cpu)
+        # if num_total_cpu > 0:
+        #     num_free_cpu = self.scheduler.block_manager.get_num_free_cpu_blocks(
+        #     )
+        #     cpu_cache_usage_sys = 1.0 - (num_free_cpu / num_total_cpu)
 
         # Iteration stats
         num_prompt_tokens_iter = 0

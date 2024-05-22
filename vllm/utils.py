@@ -122,11 +122,13 @@ class LRUCache(Generic[T]):
 
 
 def is_hip() -> bool:
+    return False
     return torch.version.hip is not None
 
 
 @lru_cache(maxsize=None)
 def is_cpu() -> bool:
+    return True
     from importlib.metadata import PackageNotFoundError, version
     try:
         return "cpu" in version("vllm")
@@ -136,6 +138,7 @@ def is_cpu() -> bool:
 
 @lru_cache(maxsize=None)
 def is_neuron() -> bool:
+    return False
     try:
         import transformers_neuronx
     except ImportError:

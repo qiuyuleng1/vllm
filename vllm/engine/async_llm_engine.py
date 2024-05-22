@@ -11,7 +11,7 @@ from vllm.config import DecodingConfig, ModelConfig
 from vllm.core.scheduler import SchedulerOutputs
 from vllm.engine.arg_utils import AsyncEngineArgs
 from vllm.engine.llm_engine import LLMEngine
-from vllm.executor.ray_utils import initialize_ray_cluster, ray
+# from vllm.executor.ray_utils import initialize_ray_cluster, ray
 from vllm.logger import init_logger
 from vllm.lora.request import LoRARequest
 from vllm.outputs import RequestOutput
@@ -345,7 +345,10 @@ class AsyncLLMEngine:
         # Create the engine configs.
         engine_config = engine_args.create_engine_config()
 
-        if engine_config.device_config.device_type == "neuron":
+        if True:
+            from vllm.executor.cpu_executor import CPUExecutorAsync
+            executor_class = CPUExecutorAsync
+        elif engine_config.device_config.device_type == "neuron":
             from vllm.executor.neuron_executor import NeuronExecutorAsync
             executor_class = NeuronExecutorAsync
         elif engine_config.device_config.device_type == "cpu":
@@ -424,21 +427,21 @@ class AsyncLLMEngine:
 
     def _init_engine(self, *args,
                      **kwargs) -> Union[_AsyncLLMEngine, "ray.ObjectRef"]:
-        if not self.engine_use_ray:
-            engine_class = self._engine_class
-        elif self.worker_use_ray:
-            engine_class = ray.remote(num_cpus=0)(self._engine_class).remote
-        else:
-            # FIXME(woosuk): This is a bit hacky. Be careful when changing the
-            # order of the arguments.
-            cache_config = kwargs["cache_config"]
-            parallel_config = kwargs["parallel_config"]
-            if parallel_config.tensor_parallel_size == 1:
-                num_gpus = cache_config.gpu_memory_utilization
-            else:
-                num_gpus = 1
-            engine_class = ray.remote(num_gpus=num_gpus)(
-                self._engine_class).remote
+        engine_class = self._engine_class
+        # if not self.engine_use_ray:
+        # elif self.worker_use_ray:
+        #     engine_class = ray.remote(num_cpus=0)(self._engine_class).remote
+        # else:
+        #     # FIXME(woosuk): This is a bit hacky. Be careful when changing the
+        #     # order of the arguments.
+        #     cache_config = kwargs["cache_config"]
+        #     parallel_config = kwargs["parallel_config"]
+        #     if parallel_config.tensor_parallel_size == 1:
+        #         num_gpus = cache_config.gpu_memory_utilization
+        #     else:
+        #         num_gpus = 1
+        #     engine_class = ray.remote(num_gpus=num_gpus)(
+        #         self._engine_class).remote
         return engine_class(*args, **kwargs)
 
     async def engine_step(self) -> bool:

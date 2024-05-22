@@ -16,6 +16,22 @@ def nullable_str(val: str):
         return None
     return val
 
+DTYPE_LIST = [
+    "fp16",
+    "bf16",
+    "int8",
+    "w8a8",
+    "int4",
+    "nf4",
+    "bf16_fp16",
+    "bf16_int8",
+    "bf16_w8a8",
+    "bf16_int4",
+    "bf16_nf4",
+    "w8a8_int8",
+    "w8a8_int4",
+    "w8a8_nf4",
+]
 
 @dataclass
 class EngineArgs:
@@ -27,9 +43,9 @@ class EngineArgs:
     tokenizer_mode: str = 'auto'
     trust_remote_code: bool = False
     download_dir: Optional[str] = None
-    load_format: str = 'auto'
-    dtype: str = 'auto'
-    kv_cache_dtype: str = 'auto'
+    load_format: str = 'xft'
+    dtype: str = 'bf16'
+    kv_cache_dtype: str = 'fp16'
     quantization_param_path: Optional[str] = None
     seed: int = 0
     max_model_len: Optional[int] = None
@@ -153,7 +169,7 @@ class EngineArgs:
             type=str,
             default=EngineArgs.load_format,
             choices=[
-                'auto', 'pt', 'safetensors', 'npcache', 'dummy', 'tensorizer'
+                'xft'
             ],
             help='The format of the model weights to load.\n\n'
             '* "auto" will try to load the weights in the safetensors format '
@@ -172,9 +188,7 @@ class EngineArgs:
             '--dtype',
             type=str,
             default=EngineArgs.dtype,
-            choices=[
-                'auto', 'half', 'float16', 'bfloat16', 'float', 'float32'
-            ],
+            choices=DTYPE_LIST,
             help='Data type for model weights and activations.\n\n'
             '* "auto" will use FP16 precision for FP32 and FP16 models, and '
             'BF16 precision for BF16 models.\n'
@@ -186,7 +200,7 @@ class EngineArgs:
         parser.add_argument(
             '--kv-cache-dtype',
             type=str,
-            choices=['auto', 'fp8'],
+            choices=['fp16', 'int8'],
             default=EngineArgs.kv_cache_dtype,
             help='Data type for kv cache storage. If "auto", will use model '
             'data type. FP8_E5M2 (without scaling) is only supported on cuda '

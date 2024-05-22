@@ -1,3 +1,51 @@
+This is a fork of vLLM to support xfastertransformer backend. This version is based on official vllm `v0.4.2`.
+## Notice
+🎉🎉🎉***Continuous batching is supported.***  🎇🎇🎇
+- Distributed is not support yet.(WIP)
+- BeamSearch is not support yet.(WIP)
+- LORA is not support yet.(WIP)
+
+## Install
+### From PyPI
+`pip install vllm-xft`
+
+### From Source
+`python3 setup.py bdist_wheel --verbose`
+
+## Usage
+### Python offline
+```
+python examples/offline_inference_xfastertransformer.py
+```
+### Serving(OpenAI Compatible Server)
+```shell
+python -m vllm.entrypoints.openai.api_server \
+        --model /data/llama-2-7b-chat-cpu \
+        --tokenizer /data/llama-2-7b-chat-hf \
+        --dtype fp16 \
+        --kv-cache-dtype fp16 \
+        --served-model-name xft \
+        --port 8000 \
+        --trust-remote-code \
+```
+- `--max-num-batched-tokens`: max batched token, default value is max(MAX_SEQ_LEN_OF_MODEL, 2048).
+- `--max-num-seqs`: max seqs batch, default is 256.  
+
+More Arguments please refer to [vllm official docs](https://docs.vllm.ai/en/latest/models/engine_args.html)  
+
+### Query example
+```shell
+  curl http://localhost:8000/v1/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "xft",
+  "prompt": "San Francisco is a",
+  "max_tokens": 512,
+  "temperature": 0
+  }'
+```
+
+
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/vllm-project/vllm/main/docs/source/assets/logos/vllm-logo-text-dark.png">

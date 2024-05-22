@@ -30,7 +30,7 @@ class ModelConfig:
     """Configuration for the model.
 
     Args:
-        model: Name or path of the huggingface model to use.
+        model: Name or path of the xfastertransformer model to use.
             It is also used as the content for `model_name` tag in metrics 
             output when `served_model_name` is not specified. 
         tokenizer: Name or path of the huggingface tokenizer to use.
@@ -38,9 +38,7 @@ class ModelConfig:
             available, and "slow" will always use the slow tokenizer.
         trust_remote_code: Trust remote code (e.g., from HuggingFace) when
             downloading the model and tokenizer.
-        dtype: Data type for model weights and activations. The "auto" option
-            will use FP16 precision for FP32 and FP16 models, and BF16 precision
-            for BF16 models.
+        dtype: Data type for model weights and activations.
         seed: Random seed for reproducibility.
         revision: The specific model version to use. It can be a branch name,
             a tag name, or a commit id. If unspecified, will use the default
@@ -117,11 +115,18 @@ class ModelConfig:
                                        or max_context_len_to_capture)
         self.max_logprobs = max_logprobs
         self.skip_tokenizer_init = skip_tokenizer_init
+        
+        import os
+        if not os.path.exists(model):
+            raise RuntimeError("Path of xFasterTransformer model doesn't exists.")
+        if not os.path.exists(tokenizer):
+            raise RuntimeError("Path of tokenizer doesn't exists.")
 
-        self.hf_config = get_config(self.model, trust_remote_code, revision,
+        self.hf_config = get_config(self.tokenizer, trust_remote_code, revision,
                                     code_revision)
         self.hf_text_config = get_hf_text_config(self.hf_config)
-        self.dtype = _get_and_verify_dtype(self.hf_text_config, dtype)
+        self.dtype = dtype
+        # self.dtype = _get_and_verify_dtype(self.hf_text_config, dtype)
         self.max_model_len = _get_and_verify_max_len(self.hf_text_config,
                                                      max_model_len)
         self.served_model_name = get_served_model_name(model,
@@ -347,8 +352,8 @@ class CacheConfig:
         self.cache_dtype = cache_dtype
         self.sliding_window = sliding_window
         self.enable_prefix_caching = enable_prefix_caching
-        self._verify_args()
-        self._verify_cache_dtype()
+        # self._verify_args()
+        # self._verify_cache_dtype()
 
         # Will be set after profiling.
         self.num_gpu_blocks = None
@@ -495,7 +500,7 @@ class LoadConfig:
         if isinstance(model_loader_extra_config, str):
             self.model_loader_extra_config = json.loads(
                 model_loader_extra_config)
-        self._verify_load_format()
+        # self._verify_load_format()
 
     def _verify_load_format(self) -> None:
         if not isinstance(self.load_format, str):
@@ -662,6 +667,10 @@ class SchedulerConfig:
 class DeviceConfig:
 
     def __init__(self, device: str = "auto") -> None:
+        self.device = torch.device("cpu")
+        self.device_type = "cpu"
+        return
+
         if device == "auto":
             # Automated device type detection
             if is_neuron():

@@ -264,31 +264,31 @@ class CPUWorker(LoraNotSupportedWorkerBase):
         else:
             seq_group_metadata_list = execute_model_req.seq_group_metadata_list
 
-        if self.is_driver_worker:
+        if True:
             assert seq_group_metadata_list is not None
             num_seq_groups: int = len(seq_group_metadata_list)
             assert execute_model_req is not None
             blocks_to_copy = execute_model_req.blocks_to_copy
             assert len(execute_model_req.blocks_to_swap_in) == 0
             assert len(execute_model_req.blocks_to_swap_out) == 0
-            data: Dict[str, Any] = {
-                "num_seq_groups": num_seq_groups,
-                "blocks_to_copy": execute_model_req.blocks_to_copy,
-            }
-            broadcast_tensor_dict(data, src=0)
+            # data: Dict[str, Any] = {
+            #     "num_seq_groups": num_seq_groups,
+            #     "blocks_to_copy": execute_model_req.blocks_to_copy,
+            # }
+            # broadcast_tensor_dict(data, src=0)
         else:
             data = broadcast_tensor_dict(src=0)
             num_seq_groups = data["num_seq_groups"]
             blocks_to_copy = data["blocks_to_copy"]
 
-        self.cache_copy(blocks_to_copy)
+        # self.cache_copy(blocks_to_copy)
 
         # If there is no input, we don't need to execute the model.
         if num_seq_groups == 0:
             return []
 
         output = self.model_runner.execute_model(seq_group_metadata_list,
-                                                 self.cpu_cache)
+                                                 None)
 
         # CPU worker only supports single-step execution.
         return [output]
@@ -319,3 +319,6 @@ class CPUWorker(LoraNotSupportedWorkerBase):
         return CPUCacheEngine.get_cache_block_size(
             self.cache_config.block_size, self.cache_config.cache_dtype,
             self.model_config, self.parallel_config)
+
+    def free_xft_cache(self, xft_seq_ids:List[int]) -> bool:
+        return self.model_runner.free_xft_cache(xft_seq_ids)
