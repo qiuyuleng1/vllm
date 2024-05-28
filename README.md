@@ -1,7 +1,6 @@
 This is a fork of vLLM to support xfastertransformer backend. This version is based on official vllm `v0.4.2`.
 ## Notice
-🎉🎉🎉***Continuous batching is supported.***  🎇🎇🎇
-- Distributed is not support yet.(WIP)
+🎉🎉🎉***Continuous batching and distributed is supported.***  🎇🎇🎇
 - BeamSearch is not support yet.(WIP)
 - LORA is not support yet.(WIP)
 
@@ -45,6 +44,32 @@ More Arguments please refer to [vllm official docs](https://docs.vllm.ai/en/late
   }'
 ```
 
+## Distributed(Multi-rank)
+Use oneCCL's `mpirun` to run the workload. The master (`rank 0`) is the same as the single-rank above, and the slaves (`rank > 0`) should use the following command:
+```bash
+python -m vllm.entrypoints.slave --dtype fp16 --model ${MODEL_PATH} --kv-cache-dtype fp16
+```
+Please keep params of slaves align with master.
+
+### Serving(OpenAI Compatible Server)
+Here is a example on 2Socket platform, 48 cores pre socket.
+```bash
+OMP_NUM_THREADS=48 mpirun \
+        -n 1 numactl --all -C 0-47 -m 0 \
+          python -m vllm.entrypoints.openai.api_server \
+            --model ${MODEL_PATH} \
+            --tokenizer ${TOKEN_PATH} \
+            --dtype bf16 \
+            --kv-cache-dtype fp16 \
+            --served-model-name xft \
+            --port 8000 \
+            --trust-remote-code \
+        : -n 1 numactl --all -C 48-95 -m 1 \
+          python -m vllm.entrypoints.slave \
+            --dtype bf16 \
+            --model ${MODEL_PATH} \
+            --kv-cache-dtype fp16
+```
 
 <p align="center">
   <picture>

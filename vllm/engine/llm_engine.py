@@ -519,8 +519,10 @@ class LLMEngine:
                 self.output_processor.process_outputs(seq_group, outputs)
 
         # Free the finished sequence groups.
-        free_xft_seq_ids = self.scheduler.free_finished_seq_groups()
-        self.model_executor.free_xft_cache(free_xft_seq_ids)
+        if output:
+            # This will be skipped if output is [], since execute_model() is skipped.
+            free_xft_seq_ids = self.scheduler.free_finished_seq_groups()
+            self.model_executor.free_xft_cache(free_xft_seq_ids)
         
 
         # Create the outputs.
