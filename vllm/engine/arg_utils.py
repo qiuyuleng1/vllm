@@ -17,6 +17,12 @@ def nullable_str(val: str):
     return val
 
 DTYPE_LIST = [
+    "auto",
+    "half",
+    "float16",
+    "bfloat16",
+    "float",
+    "float32",
     "fp16",
     "bf16",
     "int8",
@@ -44,8 +50,8 @@ class EngineArgs:
     trust_remote_code: bool = False
     download_dir: Optional[str] = None
     load_format: str = 'xft'
-    dtype: str = 'bf16'
-    kv_cache_dtype: str = 'fp16'
+    dtype: str = 'auto'
+    kv_cache_dtype: str = 'auto'
     quantization_param_path: Optional[str] = None
     seed: int = 0
     max_model_len: Optional[int] = None
@@ -200,7 +206,7 @@ class EngineArgs:
         parser.add_argument(
             '--kv-cache-dtype',
             type=str,
-            choices=['fp16', 'int8'],
+            choices=['auto', 'fp8', 'fp16', 'int8'],
             default=EngineArgs.kv_cache_dtype,
             help='Data type for kv cache storage. If "auto", will use model '
             'data type. FP8_E5M2 (without scaling) is only supported on cuda '

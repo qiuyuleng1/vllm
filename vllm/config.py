@@ -125,8 +125,7 @@ class ModelConfig:
         self.hf_config = get_config(self.tokenizer, trust_remote_code, revision,
                                     code_revision)
         self.hf_text_config = get_hf_text_config(self.hf_config)
-        self.dtype = dtype
-        # self.dtype = _get_and_verify_dtype(self.hf_text_config, dtype)
+        self.dtype = _get_and_verify_xft_dtype(dtype)
         self.max_model_len = _get_and_verify_max_len(self.hf_text_config,
                                                      max_model_len)
         self.served_model_name = get_served_model_name(model,
@@ -353,7 +352,7 @@ class CacheConfig:
         self.sliding_window = sliding_window
         self.enable_prefix_caching = enable_prefix_caching
         # self._verify_args()
-        # self._verify_cache_dtype()
+        self._verify_cache_dtype()
 
         # Will be set after profiling.
         self.num_gpu_blocks = None
@@ -371,6 +370,14 @@ class CacheConfig:
                 f"{self.gpu_memory_utilization}.")
 
     def _verify_cache_dtype(self) -> None:
+        if self.cache_dtype == "auto":
+            self.cache_dtype = "fp16"
+        elif self.cache_dtype in ["fp16", "int8"]:
+            pass
+        else:
+            raise ValueError(f"Unknown kv cache dtype: {self.cache_dtype}")
+        return
+
         if self.cache_dtype == "auto":
             pass
         elif self.cache_dtype == "fp8":
@@ -1044,6 +1051,59 @@ _STR_DTYPE_TO_TORCH_DTYPE = {
 }
 
 _ROCM_NOT_SUPPORTED_DTYPE = ["float", "float32"]
+
+_STR_DTYPE_TO_XFT_DTYPE = {
+    "half": "bf16",
+    "float16": "fp16",
+    "bfloat16": "bf16",
+}
+
+_TORCH_DTYPE_TO_XFT_DTYPE = {
+    torch.float16: "fp16",
+    torch.bfloat16: "bf16",
+}
+
+_XFT_NOT_SUPPORT_DTYPE = ["float32", "float"]
+
+_XFT_DTYPE_LIST = [
+    "fp16",
+    "bf16",
+    "int8",
+    "w8a8",
+    "int4",
+    "nf4",
+    "bf16_fp16",
+    "bf16_int8",
+    "bf16_w8a8",
+    "bf16_int4",
+    "bf16_nf4",
+    "w8a8_int8",
+    "w8a8_int4",
+    "w8a8_nf4",
+]
+
+def _get_and_verify_xft_dtype(
+    dtype: Union[str, torch.dtype],
+) -> str:
+    if isinstance(dtype, str):
+        dtype = dtype.lower()
+        if dtype == "auto":
+            return "bf16"
+        elif dtype in _XFT_DTYPE_LIST:
+            return dtype
+        elif dtype in _STR_DTYPE_TO_XFT_DTYPE:
+            return _STR_DTYPE_TO_XFT_DTYPE[dtype]
+        elif dtype in _XFT_NOT_SUPPORT_DTYPE:
+            logger.warning("{dtype} is not supported on CPU, casting to bfloat16.")
+            return "bf16"
+        else:
+            raise ValueError(f"Unknown dtype: {dtype}")
+    
+    if isinstance(dtype, torch.dtype):
+        if dtype in _TORCH_DTYPE_TO_XFT_DTYPE:
+            return _TORCH_DTYPE_TO_XFT_DTYPE[dtype]
+        else:
+            raise ValueError(f"Unknown dtype: {dtype}")
 
 
 def _get_and_verify_dtype(

@@ -85,7 +85,7 @@ class LLM:
         skip_tokenizer_init: bool = False,
         trust_remote_code: bool = False,
         tensor_parallel_size: int = 1,
-        dtype: str = "fp16",
+        dtype: str = "auto",
         quantization: Optional[str] = None,
         revision: Optional[str] = None,
         tokenizer_revision: Optional[str] = None,
