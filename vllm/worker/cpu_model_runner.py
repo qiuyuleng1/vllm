@@ -73,6 +73,7 @@ class CPUModelRunner:
         #     lora_config=self.lora_config,
         #     parallel_config=self.parallel_config,
         #     scheduler_config=self.scheduler_config)
+        logger.info(f"Loading xft model {self.model_config.model}, dtype = {self.model_config.dtype}, KV cache dtype = {self.kv_cache_dtype}")
         self.model = xfastertransformer.AutoModel.from_pretrained(
             self.model_config.model, self.model_config.dtype, self.kv_cache_dtype
         )

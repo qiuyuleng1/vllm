@@ -618,6 +618,9 @@ class EngineArgs:
 
         decoding_config = DecodingConfig(
             guided_decoding_backend=self.guided_decoding_backend)
+        
+        if model_config.dtype in ["int8", "w8a8", "int4", "nf4"] and self.kv_cache_dtype == 'auto':
+            cache_config.cache_dtype = 'int8'
 
         return EngineConfig(model_config=model_config,
                             cache_config=cache_config,
