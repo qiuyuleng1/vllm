@@ -12,6 +12,28 @@ from transformers import (AutoModelForCausalLM, AutoTokenizer,
 
 from vllm.model_executor.layers.quantization import QUANTIZATION_METHODS
 
+DTYPE_LIST = [
+    "auto",
+    "half",
+    "float16",
+    "bfloat16",
+    "float",
+    "float32",
+    "fp16",
+    "bf16",
+    "int8",
+    "w8a8",
+    "int4",
+    "nf4",
+    "bf16_fp16",
+    "bf16_int8",
+    "bf16_w8a8",
+    "bf16_int4",
+    "bf16_nf4",
+    "w8a8_int8",
+    "w8a8_int4",
+    "w8a8_nf4",
+]
 
 def sample_requests(
     dataset_path: str,
@@ -296,7 +318,7 @@ if __name__ == "__main__":
         '--dtype',
         type=str,
         default='auto',
-        choices=['auto', 'half', 'float16', 'bfloat16', 'float', 'float32'],
+        choices=DTYPE_LIST,
         help='data type for model weights and activations. '
         'The "auto" option will use FP16 precision '
         'for FP32 and FP16 models, and BF16 precision '
@@ -313,7 +335,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--kv-cache-dtype",
         type=str,
-        choices=["auto", "fp8"],
+        choices=['auto', 'fp8', 'fp16', 'int8'],
         default="auto",
         help=
         'Data type for kv cache storage. If "auto", will use model data type. '
@@ -333,7 +355,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--device",
         type=str,
-        default="cuda",
+        ddefault="cpu",
         choices=["cuda", "cpu"],
         help='device type for vLLM execution, supporting CUDA and CPU.')
     parser.add_argument(
