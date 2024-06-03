@@ -355,7 +355,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--device",
         type=str,
-        ddefault="cpu",
+        default="cpu",
         choices=["cuda", "cpu"],
         help='device type for vLLM execution, supporting CUDA and CPU.')
     parser.add_argument(
