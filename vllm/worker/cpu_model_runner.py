@@ -337,6 +337,8 @@ class CPUModelRunner:
         (input_tokens, input_positions, xft_seq_ids, xft_max_lens, attn_metadata, sampling_metadata,
          multi_modal_input
          ) = self.prepare_input_tensors(seq_group_metadata_list)
+        print("information", input_tokens, input_positions, xft_seq_ids, xft_max_lens, attn_metadata, sampling_metadata,
+         multi_modal_input)
 
         xft_seq_ids = self.model.set_input_cb(input_tokens, xft_seq_ids, xft_max_lens).tolist()
 
@@ -347,9 +349,21 @@ class CPUModelRunner:
 
         # Compute the logits.
         logits = self.model.forward_cb()
-
+        print("logits: ", logits)
+        
+        from mpi4py import MPI
+        comm = MPI.COMM_WORLD  # 初始化一个全局的通讯器
+        
+        print("开始接收数据")
+        logits2 = comm.recv(source=1)  # 从rank=1接收数据到recv_tmp_tensor
+        print("数据已接收")
+        
+        print("recv_tmp_tensor", logits2)
+        
         # Sample the next token.
-        output = self.sampler(logits, sampling_metadata)
+        output = self.sampler(logits2, sampling_metadata)  # 相当于self.sampler.forward, 这是pytorch的设计策略
+        print("output: ", output)
+        
         return output
 
     def free_xft_cache(self, xft_seq_ids:List[int]) -> bool:

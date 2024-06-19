@@ -520,6 +520,9 @@ class LLMEngine:
 
         # Free the finished sequence groups.
         if output:
+            print("!!!!! LLMEngine free_xft_cache")
+            import traceback
+            traceback.print_stack()
             # This will be skipped if output is [], since execute_model() is skipped.
             free_xft_seq_ids = self.scheduler.free_finished_seq_groups()
             self.model_executor.free_xft_cache(free_xft_seq_ids)
