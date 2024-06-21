@@ -47,22 +47,5 @@ if __name__ == "__main__":
 
                 print_info = "数据已发送"
                 f.write(print_info + "\n")  #直接写入你要的字符串
-        
-        
-        
-        
-        
-        # xft_seq_ids = model.set_input_cb()
-        # print("type_xft_seq_ids", type(xft_seq_ids))  # list
-        
-        # logits = model.forward_cb()
-        # # if logits:
-        # print("logits", logits)
-        # if model.color == 1: #TODO 这个判断咋写
-        #     # tmp_tensor = torch.Tensor()
-        #     # tmp_tensor = tmp_tensor.new_full((3, 2), 7)
-        #     # tmp = 512
-        #     print("开始发送数据")
-        #     comm.send(logits, dest=0)  # list怎样用做tag？list里面的挨着发？
-        #     print("数据已发送")
-        # model.free_seqs()
+                
+            model.free_seqs()
