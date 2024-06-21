@@ -354,10 +354,10 @@ class CPUModelRunner:
         from mpi4py import MPI
         import os
         
-        xft_pipeline_stage = os.environ.get('XFT_PIPELINE_STAGE')
+        xft_pipeline_stage = int(os.environ.get('XFT_PIPELINE_STAGE'))
         print(xft_pipeline_stage)
         
-        if int(xft_pipeline_stage) > 1:
+        if xft_pipeline_stage > 1:
             comm = MPI.COMM_WORLD  # 初始化一个全局的通讯器
 
             print("开始接收数据")
