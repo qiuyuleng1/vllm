@@ -352,16 +352,22 @@ class CPUModelRunner:
         print("logits: ", logits)
         
         from mpi4py import MPI
-        comm = MPI.COMM_WORLD  # 初始化一个全局的通讯器
+        import os
         
-        print("开始接收数据")
-        logits2 = comm.recv(source=1)  # 从rank=1接收数据到recv_tmp_tensor
-        print("数据已接收")
+        xft_pipeline_stage = os.environ.get('XFT_PIPELINE_STAGE')
+        print(xft_pipeline_stage)
         
-        print("recv_tmp_tensor", logits2)
+        if int(xft_pipeline_stage) > 1:
+            comm = MPI.COMM_WORLD  # 初始化一个全局的通讯器
+
+            print("开始接收数据")
+            logits = comm.recv(source = xft_pipeline_stage*(xft_pipeline_stage-1))  # 从last pp rank的tp rank 0接收数据到recv_tmp_tensor
+            print("数据已接收")
+            
+            print("recv_tmp_tensor", logits)
         
         # Sample the next token.
-        output = self.sampler(logits2, sampling_metadata)  # 相当于self.sampler.forward, 这是pytorch的设计策略
+        output = self.sampler(logits, sampling_metadata)  # 相当于self.sampler.forward, 这是pytorch的设计策略
         print("output: ", output)
         
         return output

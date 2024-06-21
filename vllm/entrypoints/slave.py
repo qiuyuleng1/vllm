@@ -39,7 +39,7 @@ if __name__ == "__main__":
             logits = model.forward_cb()
             f.write("\n logits: " + np.array2string(logits.detach().cpu().numpy()) + "\n") 
 
-            if model.color == 1:
+            if model.color == 1 and model.rank == 0:  # tp+pp时，只让rank 0 发送logits，因为logits是shared memory，谁发都一样
                 print_info = "开始发送数据"
                 f.write(print_info + "\n")  
 
