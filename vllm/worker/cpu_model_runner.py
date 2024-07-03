@@ -347,30 +347,55 @@ class CPUModelRunner:
                 seq_id = list(seq_group_metadata_list[i].seq_data.keys())[0]
                 seq_group_metadata_list[i].seq_data[seq_id].xft_ids = xft_seq_ids[i]
 
-        # Compute the logits.
-        logits = self.model.forward_cb()
-        print("logits: ", logits)
-        
-        from mpi4py import MPI
-        import os
-        
-        xft_pipeline_stage = os.environ.get('XFT_PIPELINE_STAGE')
-        print(xft_pipeline_stage)
-        
-        if int(xft_pipeline_stage) > 1:
-            comm = MPI.COMM_WORLD  # 初始化一个全局的通讯器
+        # Compute the logits.        
+        logits1 = self.model.forward_cb()
+        print("!!!!logits1: ", logits1)
 
-            print("开始接收数据")
-            logits = comm.recv(source = xft_pipeline_stage*(xft_pipeline_stage-1))  # 从last pp rank的tp rank 0接收数据到recv_tmp_tensor
-            print("数据已接收")
+        logits2 = torch.load('/home/johnson/qiuyu/susu-xft/benchmark/pp3_logits.pt')
+        print("!!!!logits2: ", logits2)
+
+        # 检查 logits1 和 logits2 的 shape
+        logits1_shape = logits1.shape
+        logits2_shape = logits2.shape
+
+        if logits1_shape != logits2_shape:
+            if logits1_shape[0] > logits2_shape[0] and logits1_shape[1] == logits2_shape[1]:
+                # 重复 logits2 行，直到其行数与 logits1 相同
+                logits2 = logits2.repeat(logits1_shape[0], 1)
+            else:
+                raise ValueError("logits1 and logits2 have incompatible shapes")
+
+        print("!!!!logits2 (after matching shape): ", logits2)
+        
+        # ==========================  测试不处理output，会不会堵塞 ===============================
+        # from mpi4py import MPI
+        # import os
+        
+        # xft_pipeline_stage = int(os.environ.get('XFT_PIPELINE_STAGE'))
+        # print(xft_pipeline_stage)
+        
+        # if xft_pipeline_stage > 1:
+        #     comm = MPI.COMM_WORLD  # 初始化一个全局的通讯器
+
+        #     print("开始接收数据")
+        #     logits = comm.recv(source = xft_pipeline_stage-1)  # 从last pp rank的tp rank 0接收数据到recv_tmp_tensor
+        #     print("数据已接收")
             
-            print("recv_tmp_tensor", logits)
+        #     print("recv_tmp_tensor", logits)
+        # ======================================================================================
         
         # Sample the next token.
-        output = self.sampler(logits, sampling_metadata)  # 相当于self.sampler.forward, 这是pytorch的设计策略
-        print("output: ", output)
+        output = self.sampler(logits2, sampling_metadata)  # 相当于self.sampler.forward, 这是pytorch的设计策略
+        print("!!!!output: ", output)
+        print("!!!! sampling_metadata", sampling_metadata)
+        
+        import pickle
+        with open('pp3_output.pkl', 'wb') as file:
+            pickle.dump(output, file)
+        print("Save output to file.")
         
         return output
+        
 
     def free_xft_cache(self, xft_seq_ids:List[int]) -> bool:
         return self.model.free_seqs(

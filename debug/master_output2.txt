@@ -1,0 +1,594 @@
+
+ !!! Process PID is591864
+ run_engine_loop while True has_requests_in_progress
+False
+Waiting for new requests...
+
+ Got new requests!
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0>
+
+ !!! Process PID is591864
+ run_engine_loop while True has_requests_in_progress
+False
+Waiting for new requests...
+
+ Got new requests!
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+False
+Waiting for new requests...
+
+ Got new requests!
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the', token_ids=[278], cumulative_logprob=-1.943701982498169, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the', token_ids=[278], cumulative_logprob=-1.943701982498169, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=1>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the', token_ids=[278, 278], cumulative_logprob=-3.887403964996338, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the', token_ids=[278, 278], cumulative_logprob=-3.887403964996338, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=2>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the', token_ids=[278, 278, 278], cumulative_logprob=-5.831105947494507, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the', token_ids=[278, 278, 278], cumulative_logprob=-5.831105947494507, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=3>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the', token_ids=[278, 278, 278, 278], cumulative_logprob=-7.774807929992676, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the', token_ids=[278, 278, 278, 278], cumulative_logprob=-7.774807929992676, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=4>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the', token_ids=[278, 278, 278, 278, 278], cumulative_logprob=-9.718509912490845, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the', token_ids=[278, 278, 278, 278, 278], cumulative_logprob=-9.718509912490845, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=5>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the', token_ids=[278, 278, 278, 278, 278, 278], cumulative_logprob=-11.662211894989014, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the', token_ids=[278, 278, 278, 278, 278, 278], cumulative_logprob=-11.662211894989014, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=6>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-13.605913877487183, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-13.605913877487183, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=7>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-15.549615859985352, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-15.549615859985352, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=8>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-17.49331784248352, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-17.49331784248352, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=9>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-19.43701982498169, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-19.43701982498169, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=10>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-21.38072180747986, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-21.38072180747986, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=11>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-23.324423789978027, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-23.324423789978027, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=12>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-25.268125772476196, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-25.268125772476196, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=13>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-27.211827754974365, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-27.211827754974365, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=14>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-29.155529737472534, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-29.155529737472534, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=15>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-31.099231719970703, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-31.099231719970703, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=16>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-33.04293370246887, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-33.04293370246887, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=17>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-34.98663568496704, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-34.98663568496704, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=18>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-36.93033766746521, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-36.93033766746521, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=19>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-38.87403964996338, logprobs=None, finish_reason=length, stop_reason=None)], finished=True, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=1719915648.4444444), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-864b02fb0b12498a802045210face53e-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the the the the the the the the the the the the the the the the the the the the', token_ids=[278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278, 278], cumulative_logprob=-38.87403964996338, logprobs=None, finish_reason=length, stop_reason=None)], finished=True, metrics=RequestMetrics(arrival_time=1719915646.6601837, last_token_time=1719915646.6601837, first_scheduled_time=1719915646.660833, first_token_time=1719915646.8079846, time_in_queue=0.0006492137908935547, finished_time=1719915648.4444444), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=20>
+
+ !!! Process PID is592719
+ run_engine_loop while True has_requests_in_progress
+True
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 

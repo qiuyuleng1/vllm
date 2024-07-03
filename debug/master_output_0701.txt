@@ -1,0 +1,35 @@
+
+ !!! Process PID is578629
+ run_engine_loop while True has_requests_in_progress
+False
+Waiting for new requests...
+
+ Got new requests!
+
+ call engine step 
+!!!! request_outputs []
+
+ step_async request_outputs
+str(self.engine.output_queue.empty())True
+ in run_engine_loop, engine_step returned.
+False
+ asyncio.create_task(self.engine.process_last_pp_logits()) 
+process_last_pp_logits output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=None)})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ process_last_pp_logits if output[SamplerOutput(outputs=[SequenceGroupOutput(samples=[SequenceOutput(parent_seq_id=0, output_token=278, logprobs={278: Logprob(logprob=-1.943701982498169, rank=1, decoded_token=' the')})], prompt_logprobs=None)], sampled_token_probs=None, sampled_token_ids=None, spec_decode_worker_metrics=None)]
+
+ self.output_queue.put(request_output) RequestOutput(request_id=cmpl-32c38d725a724203b7bf0cd4a9b29a26-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the', token_ids=[278], cumulative_logprob=-1.943701982498169, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719853490.1798043, last_token_time=1719853490.1798043, first_scheduled_time=1719853490.1804705, first_token_time=1719853490.3250904, time_in_queue=0.0006661415100097656, finished_time=None), lora_request=None)
+process_last_pp_logits finished!
+ run engine loop while True
+
+ engine_step request_outputs RequestOutput(request_id=cmpl-32c38d725a724203b7bf0cd4a9b29a26-0, prompt='I have an apple', prompt_token_ids=[1, 306, 505, 385, 26163], prompt_logprobs=None, outputs=[CompletionOutput(index=0, text=' the', token_ids=[278], cumulative_logprob=-1.943701982498169, logprobs=None, finish_reason=None, stop_reason=None)], finished=False, metrics=RequestMetrics(arrival_time=1719853490.1798043, last_token_time=1719853490.1798043, first_scheduled_time=1719853490.1804705, first_token_time=1719853490.3250904, time_in_queue=0.0006661415100097656, finished_time=None), lora_request=None)
+
+ run engine loop while True
+
+ engine step return not self.engine.output_queue.empty()
+self.engine.output_queue <Queue maxsize=0 tasks=1>
+
+ !!! Process PID is578629
+ run_engine_loop while True has_requests_in_progress
+False
+Waiting for new requests...

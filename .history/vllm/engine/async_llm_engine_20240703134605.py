@@ -699,7 +699,7 @@ class AsyncLLMEngine:
                     f.write("\n run engine loop while True\n")
                     f.flush()  # 确保内容被写入到文件
                 if self.engine.output_queue.empty():
-                    break
+                    continue
                 request_output = await self.engine.output_queue.get()
                 has_requests_in_progress = True
                 with open("master_output1.txt", "a") as f:
