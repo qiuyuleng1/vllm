@@ -30,7 +30,7 @@ DEFAULT_LOGGING_CONFIG = {
         "vllm": {
             "class": "logging.StreamHandler",
             "formatter": "vllm",
-            "level": "INFO",
+            "level": "DEBUG",
             "stream": "ext://sys.stdout",
         },
     },

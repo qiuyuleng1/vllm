@@ -512,36 +512,22 @@ class LLMEngine:
         # [step][sequence group].
         output_by_sequence_group = create_output_by_sequence_group(
             sampler_outputs=output, num_seq_groups=len(scheduled_seq_groups))
-        print("!!!! output_by_sequence_group", output_by_sequence_group)
+        logger.debug("_process_model_outputs, output_by_sequence_group" + str(output_by_sequence_group))
 
         # Update the scheduled sequence groups with the model outputs.
         for scheduled_seq_group, outputs, seq_group_meta in zip(
                 scheduled_seq_groups, output_by_sequence_group,
                 seq_group_metadata_list):
-            print("!!!! outputs", outputs)
-            
-            
-            
-            with open("master_output1.txt", "a") as f:
-                string = "\n _process_model_outputs "+ str(outputs)+ "\n"
-                f.write(string)
-                f.flush()
             
             seq_group = scheduled_seq_group.seq_group
             seq_group.update_num_computed_tokens(
                 scheduled_seq_group.token_chunk_size)
-            print("!!!! seq_group afterupdate_num_computed_tokens ", seq_group)
             self.output_processor.process_prompt_logprob(seq_group, outputs)
-            print("!!!! seq_group after process_prompt_logprob", seq_group)
-            print("!!!! seq_group_meta", seq_group_meta)
             if seq_group_meta.do_sample:
                 self.output_processor.process_outputs(seq_group, outputs)
 
         # Free the finished sequence groups.
         if output:
-            print("!!!!! LLMEngine free_xft_cache")
-            import traceback
-            traceback.print_stack()
             # This will be skipped if output is [], since execute_model() is skipped.
             free_xft_seq_ids = self.scheduler.free_finished_seq_groups()
             self.model_executor.free_xft_cache(free_xft_seq_ids)

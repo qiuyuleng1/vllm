@@ -349,10 +349,10 @@ class CPUModelRunner:
 
         # Compute the logits.        
         logits1 = self.model.forward_cb()
-        print("!!!!logits1: ", logits1)
-
+        
+        logger.debug("END master forward CB.")
+        
         logits2 = torch.load('/home/johnson/qiuyu/susu-xft/benchmark/pp3_logits.pt')
-        print("!!!!logits2: ", logits2)
 
         # 检查 logits1 和 logits2 的 shape
         logits1_shape = logits1.shape
@@ -364,8 +364,6 @@ class CPUModelRunner:
                 logits2 = logits2.repeat(logits1_shape[0], 1)
             else:
                 raise ValueError("logits1 and logits2 have incompatible shapes")
-
-        print("!!!!logits2 (after matching shape): ", logits2)
         
         # ==========================  测试不处理output，会不会堵塞 ===============================
         # from mpi4py import MPI
@@ -386,8 +384,6 @@ class CPUModelRunner:
         
         # Sample the next token.
         output = self.sampler(logits2, sampling_metadata)  # 相当于self.sampler.forward, 这是pytorch的设计策略
-        print("!!!!output: ", output)
-        print("!!!! sampling_metadata", sampling_metadata)
         
         import pickle
         with open('pp3_output.pkl', 'wb') as file:

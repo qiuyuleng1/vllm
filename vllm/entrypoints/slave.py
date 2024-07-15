@@ -31,11 +31,13 @@ if __name__ == "__main__":
 
     while True:
         with open("slave_output.txt", "a") as f:  
-            f.write("=============slave===============")
+            f.write("=============slave===============\n")
             f.flush()
-            f.write(f"model rank: {model.rank}, color: {model.color}, section: {model.section}")
+            f.write(f"model rank: {model.rank}, color: {model.color}, section: {model.section}\n")
             f.flush()
-            model.set_input_cb()
+            tmp = model.set_input_cb()  # TODO 能不能从这里拿元数据
+            f.write("\n model.set_input_cb() output " + str(tmp) + "\n")
+            f.flush()
             f.write("finish set_input_cb")
             f.flush()
             logits = model.forward_cb()
@@ -51,9 +53,14 @@ if __name__ == "__main__":
             
             if model.color == xft_pipeline_stage-1 and model.rank == 0:  # tp+pp时，只让rank 0 发送logits，因为logits是shared memory，谁发都一样
                 print_info = "开始发送数据"
-                f.write(print_info + "\n")  
-
-                comm.send(logits, dest=0)  
+                f.write(print_info + "\n")
+                
+                # logits_shape = logits.shape  
+                f.write("\nStart recv, logits_shape = " + str(logits.numpy().shape) +", logits_dtype = " + str(logits.numpy().dtype))
+                # comm.send(logits.numpy(), dest=0)  
+                
+                data = np.array([1, 2, 3, 4, 5], dtype=np.float32)
+                comm.send(data, dest=0)
 
                 print_info = "数据已发送"
                 f.write(print_info + "\n")  #直接写入你要的字符串

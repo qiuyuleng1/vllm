@@ -294,6 +294,8 @@ class Scheduler:
         # Sequence groups in the SWAPPED state.
         # Contain decode requests that are swapped out.
         self.swapped: Deque[SequenceGroup] = deque()
+        
+        self.pp0_seq_groups: Deque[SequenceGroup] = deque()
 
         # Time at previous scheduling step
         self.prev_time = 0.0
@@ -413,9 +415,16 @@ class Scheduler:
         running_queue = policy.sort_by_priority(now, running_queue)
         while running_queue:
             seq_group = running_queue[0]
+            
+            logger.debug("seq group = " + str(seq_group))
+            logger.debug("seq_group.is_finished()" + str(seq_group.is_finished()))
+            
+            
             num_running_tokens = self._get_num_new_tokens(
                 seq_group, SequenceStatus.RUNNING, enable_chunking, budget)
 
+            logger.debug("budget = " + str(budget))
+            logger.debug("num_running_tokens = " + str(num_running_tokens))
             if num_running_tokens == 0:
                 break
 
@@ -451,8 +460,8 @@ class Scheduler:
             else:
                 # self._append_slots(seq_group, blocks_to_copy)
                 is_prefill = seq_group.is_prefill()
-                if is_prefill:
-                    prefill_seq_groups.append(
+                if is_prefill: # 这个是为chunk prefill准备的
+                    prefill_seq_groups.append(  
                         ScheduledSequenceGroup(
                             seq_group=seq_group,
                             token_chunk_size=num_running_tokens))
@@ -726,6 +735,7 @@ class Scheduler:
         be swapped or preempted.
         """
         # Include running requests to the budget.
+        logger.debug("0 original len(self.running)" + str(len(self.running)))
         budget = SchedulingBudget(
             token_budget=self.scheduler_config.max_num_batched_tokens,
             max_num_seqs=self.scheduler_config.max_num_seqs,
@@ -755,6 +765,7 @@ class Scheduler:
         # Don't schedule decodes if prefills are scheduled.
         # NOTE: If `_schedule_prefills` doesn't enable chunking, self.running
         # only contains decode requests, not chunked prefills.
+        logger.debug("1 original len(self.running) " + str(len(self.running)))
         if len(prefills.seq_groups) == 0:
             remaining_running, running_scheduled = self._schedule_running(
                 self.running,
@@ -778,12 +789,17 @@ class Scheduler:
         self.waiting = remaining_waiting
         self.waiting.extendleft(running_scheduled.preempted)
         # Update new running requests.
-        self.running = remaining_running
+        self.running = remaining_running 
+        logger.debug("len(remaining_running) " + str(len(self.running)))
+        logger.debug("running_scheduled, " + str(running_scheduled))
         self.running.extend([s.seq_group for s in prefills.seq_groups])
+        logger.debug("len(remaining_running+prefill) " + str(len(self.running)))
         self.running.extend(
             [s.seq_group for s in running_scheduled.decode_seq_groups])
+        logger.debug("len(remaining_running+running_scheduled) " + str(len(self.running)))
         self.running.extend(
             [s.seq_group for s in swapped_in.decode_seq_groups])
+        logger.debug("len(remaining_running+swapped_in) " + str(len(self.running)))
         # Update swapped requests.
         self.swapped = remaining_swapped
         self.swapped.extend(running_scheduled.swapped_out)
@@ -1019,6 +1035,20 @@ class Scheduler:
         self.running = deque(seq_group for seq_group in self.running
                              if not seq_group.is_finished())
         return free_xft_seq_ids
+    
+    def temp_remove_pp0_seq_groups(self):
+        # 直接操作self.running
+        self.pp0_seq_groups.extend(self.running)
+        while self.running:  
+            self.running.pop()
+        
+    
+    def put_back_pp3_seq_groups(self, request_id):
+        if self.pp0_seq_groups:
+            if self.pp0_seq_groups[0].request_id == request_id:
+                item = self.pp0_seq_groups.popleft()
+                self.running.append(item)
+                logger.debug("self.pp0_seq_groups.popleft() "+str(item))
 
     def _allocate_and_set_running(self, seq_group: SequenceGroup) -> None:
         # self.block_manager.allocate(seq_group)

@@ -55,6 +55,12 @@ class AsyncStream:
         self.request_id = request_id
         self._queue: asyncio.Queue = asyncio.Queue()
         self._finished = False
+        
+    def __str__(self):
+        return f"AsyncStream _queue: {self._queue}"
+
+    def __repr__(self):
+        return self.__str__()
 
     def put(self, item: Union[RequestOutput, Exception]) -> None:
         if self._finished:
@@ -117,6 +123,7 @@ class RequestTracker:
             request_id = request_output.request_id
             print("request_id, request_output", request_id, request_output)
             self._request_streams[request_id].put(request_output)
+            logger.debug("In process_request_output, request_output = " + str(request_output))
             if request_output.finished:
                 if verbose:
                     logger.info("Finished request %s.", request_id)
@@ -145,6 +152,8 @@ class RequestTracker:
             "request_id": request_id,
             **engine_add_request_kwargs
         }))
+        
+        logger.debug("self._new_requests empty3"+str(self._new_requests.empty()))
 
         self.new_requests_event.set()
 
@@ -208,10 +217,15 @@ class _AsyncLLMEngine(LLMEngine):
         and updates the scheduler with the model outputs. Finally, it decodes
         the sequences and returns the newly generated results.
         """
+        logger.debug("START step_async")
         seq_group_metadata_list, scheduler_outputs = self.scheduler.schedule()
-        print("!!!! seq_group_metadata_list", seq_group_metadata_list)
-        print("!!!! scheduler_outputs", scheduler_outputs)
-        print("!!!! scheduler_outputs.is_empty()", scheduler_outputs.is_empty())
+        
+        logger.debug("In step_async, after schedule, seq_group_metadata_list="+str(seq_group_metadata_list))
+        logger.debug("In step_async, after schedule, scheduler_outputs="+str(scheduler_outputs))
+        logger.debug("In step_async, not scheduler_outputs.is_empty() "+str(not scheduler_outputs.is_empty()))
+        
+        for seq_group in self.scheduler.running:
+            logger.debug("seq_group" + str(seq_group))
 
         if not scheduler_outputs.is_empty():
             # Execute the model.
@@ -234,41 +248,25 @@ class _AsyncLLMEngine(LLMEngine):
                 # Log stats.
                 self.do_log_stats(scheduler_outputs, output)
             else:
-                print("if no output", output)
-                # request_outputs = [1]
                 request_outputs = []
+            
         else:
             output = []
-            print("!!!! output before _process_model_outputs", output)
             request_outputs = self._process_model_outputs(
                 output, scheduler_outputs.scheduled_seq_groups,
                 scheduler_outputs.ignored_seq_groups, seq_group_metadata_list)
             # Log stats.
             self.do_log_stats(scheduler_outputs, output)
-            
-        with open("master_output1.txt", "a") as f:
-            output_string = "!!!! request_outputs " + str(request_outputs) + "\n"
-            f.write(output_string)
-            f.flush()
-        
-        print("!!!! request_outputs", request_outputs)
         
         # Save scheduler outputs and metadata for later use in queues
         self.scheduler_outputs_queue.append(scheduler_outputs)
         self.seq_group_metadata_queue.append(seq_group_metadata_list)
         
-        # Create a future and start the process_last_pp_logits asynchronously
-        # future = asyncio.get_event_loop().create_future()
-        # asyncio.create_task(self.process_last_pp_logits(future))
+        logger.debug("END step_async")
         
-        # asyncio.create_task(self.process_last_pp_logits())
+        self.scheduler.temp_remove_pp0_seq_groups()
         
-        with open("master_output1.txt", "a") as f:
-            output_string = "\n step_async request_outputs\n"
-            f.write(output_string)
-            f.flush()
-        
-        return request_outputs
+        return [request_outputs, not scheduler_outputs.is_empty()]
 
     async def encode_request_async(
         self,
@@ -317,75 +315,73 @@ class _AsyncLLMEngine(LLMEngine):
     async def check_health_async(self) -> None:
         self.model_executor.check_health()
         
-    async def process_last_pp_logits(self):
-        # while True:
-            print("process_last_pp_logits scheduler_outputs_queue", self.scheduler_outputs_queue)
-            print("process_last_pp_logits seq_group_metadata_queue", self.seq_group_metadata_queue)
+    async def process_last_pp_logits(self):            
+        scheduler_outputs = None
+        if self.scheduler_outputs_queue and self.seq_group_metadata_queue:
+            scheduler_outputs = self.scheduler_outputs_queue.popleft()
+            seq_group_metadata_list = self.seq_group_metadata_queue.popleft()
+            
+        if scheduler_outputs and not scheduler_outputs.is_empty():  # TODO
+            logger.debug("Start process_last_pp_logits")
+            from mpi4py import MPI
+            
+            xft_pipeline_stage = int(os.environ.get('XFT_PIPELINE_STAGE'))
+            print(xft_pipeline_stage)
+            
+            if xft_pipeline_stage > 1:
+                comm = MPI.COMM_WORLD  # 初始化一个全局的通讯器
+                
+                logger.debug("Start recv")
+                # logits = comm.recv(source = xft_pipeline_stage-1)  # 从last pp rank的tp rank 0接收数据到recv_tmp_tensor
+                # logger.debug(str(help(comm.recv)))
+                # logger.debug(str(help(comm.irecv)))
+                # logger.debug(str(help(comm.Irecv)))
+                # logger.debug(str(help(comm.send)))
+                # logger.debug("DONE recv, logits shape = " + str(logits.shape) + " logits dtype = " + str(logits.dtype))  # 为啥是torch.float32的？
+                
+                # 改用非堵塞的mpi recv
+                # buf = torch.empty((1, 32000), dtype=torch.float32)
+                # logger.debug("Receiving tensor. Allocated buffer with shape: " + str(buf.shape) + " and dtype: " + str(buf.dtype))
+                #                     # while not request.Test():
+                    #     await asyncio.sleep(0.01)
+                
+                try:
+                    logger.debug("Start recv")
+                    # import torch
+                    # import numpy as np
+                    # buf = np.empty((1, 32000), dtype=np.float32)
+                    # request = comm.irecv(buf, source=xft_pipeline_stage - 1)
+                    # logits = request.wait()
+                    # logger.debug("DONE recv")
+                    # logger.debug(f"Received data: {logits}")
+                    
+                    # buf = np.empty(5, dtype=np.float32)
+                    # data = comm.recv(source = xft_pipeline_stage-1)
+                    
+                    request = comm.irecv(source=xft_pipeline_stage - 1)
+                    while not request.Test(): # 检查是否完成接收
+                        await asyncio.sleep(0) # 未完成接收则执行其他协程任务
+                    
+                    data = request.wait()
+                    logger.debug(f"Received data: {data}")
 
-            if self.scheduler_outputs_queue and self.seq_group_metadata_queue:
-                scheduler_outputs = self.scheduler_outputs_queue.popleft()
-                seq_group_metadata_list = self.seq_group_metadata_queue.popleft()
+                except Exception as e:
+                    logger.debug("Error in mpi irecv: "+ str(e))
                 
-            if not scheduler_outputs.is_empty():  # TODO
-                with open("master_output1.txt", "a") as f:
-                    f.write("\n start process_last_pp_logits 1\n")
-                    f.flush()
                 
-                from mpi4py import MPI
+                # TODO 先不sampling，随便搞个output来，但是要贴batch size
+                import pickle
+                with open('/home/johnson/qiuyu/vllm-xft/debug/pp3_output.pkl', 'rb') as file:
+                    output = [pickle.load(file)]
+                print(output)
                 
-                xft_pipeline_stage = int(os.environ.get('XFT_PIPELINE_STAGE'))
-                print(xft_pipeline_stage)
-                
-                if xft_pipeline_stage > 1:
-                    comm = MPI.COMM_WORLD  # 初始化一个全局的通讯器
+                if output:
+                    request_outputs = self._process_model_outputs(
+                    output, scheduler_outputs.scheduled_seq_groups,
+                    scheduler_outputs.ignored_seq_groups, seq_group_metadata_list)
                     
-                    with open("master_output1.txt", "a") as f:
-                        f.write("\n start recv\n")
-                        f.flush()
-
-                    print("开始接收数据")
-                    logits = comm.recv(source = xft_pipeline_stage-1)  # 从last pp rank的tp rank 0接收数据到recv_tmp_tensor
-                    print("数据已接收")
-                    
-                    with open("master_output1.txt", "a") as f:
-                        f.write("\n DONE recv\n")
-                        f.flush()
-                    
-                    print("recv_tmp_tensor", logits)
-                    
-                    # TODO 先不sampling，随便搞个output来，但是要贴batch size
-                    import pickle
-                    with open('/home/johnson/qiuyu/vllm-xft/debug/pp3_output.pkl', 'rb') as file:
-                        output = [pickle.load(file)]
-                    print(output)
-                    
-                    with open("master_output1.txt", "a") as f:
-                        string = "process_last_pp_logits output"+ str(output)+ "\n"
-                        f.write(string)
-                        f.flush()
-                    
-                    if output:
-                        print("!!!! process_last_pp_logits scheduler_outputs", scheduler_outputs)
-                        print("!!!! process_last_pp_logits seq_group_metadata_list", seq_group_metadata_list)
-                        request_outputs = self._process_model_outputs(
-                        output, scheduler_outputs.scheduled_seq_groups,
-                        scheduler_outputs.ignored_seq_groups, seq_group_metadata_list)
-                        
-                        with open("master_output1.txt", "a") as f:
-                            string = "\n process_last_pp_logits if output"+ str(output)+ "\n"
-                            f.write(string)
-                            f.flush()
-                        for request_output in request_outputs:
-                            with open("master_output1.txt", "a") as f:
-                                string = "\n self.output_queue.put(request_output) "+ str(request_output)+ "\n"
-                                f.write(string)
-                                f.flush()
-                            await self.output_queue.put(request_output)
-                            
-                    with open("master_output1.txt", "a") as f:
-                        f.write("process_last_pp_logits finished!")
-                        f.flush()
-                
+                    for request_output in request_outputs:
+                        await self.output_queue.put(request_output)
                 
 
 
@@ -442,6 +438,8 @@ class AsyncLLMEngine:
 
         # Lazy initialized fields
         self._request_tracker: RequestTracker
+        
+        self.has_requests_in_pp3_progress = False
 
     @classmethod
     def from_engine_args(
@@ -560,6 +558,8 @@ class AsyncLLMEngine:
 
         new_requests, finished_requests = (
             self._request_tracker.get_new_and_finished_requests())
+        
+        logger.debug("In engine_step, get_new_and_finished_requests, new_requests = "+str(new_requests))
 
         for new_request in new_requests:
             # Add the request into the vLLM engine's waiting queue.
@@ -584,142 +584,80 @@ class AsyncLLMEngine:
         if self.engine_use_ray:
             request_outputs = await self.engine.step.remote()  # type: ignore
         else:
-            request_outputs = await self.engine.step_async()
-            
+            [request_outputs,scheduler_outputs_status] = await self.engine.step_async()
+        
+        logger.debug("engine step, scheduler_outputs="+str(scheduler_outputs_status))    
         # Push the outputs to the async queue
         for request_output in request_outputs:
-            with open("master_output1.txt", "a") as f:
-                output_string = "\n for request_output in request_output \n"
-                f.write(output_string)
-                f.flush()  # 确保内容被写入到文件
             await self.engine.output_queue.put(request_output)
 
-        # Put the outputs into the corresponding streams.
-        # for request_output in request_outputs:
-        #     self._request_tracker.process_request_output(
-        #         request_output, verbose=self.log_requests)
-        with open("master_output1.txt", "a") as f:
-            f.write("str(self.engine.output_queue.empty())")
-            f.write(str(self.engine.output_queue.empty()))
-            f.flush()  # 确保内容被写入到文件
-        
-        # while not self.engine.output_queue.empty():
-        #     request_output = await self.engine.output_queue.get()
-        #     with open("master_output1.txt", "a") as f:
-        #         output_string = "\n engine_step request_outputs " + str(request_output) + "\n"
-        #         f.write(output_string)
-        #         f.flush()  # 确保内容被写入到文件
-        #     self._request_tracker.process_request_output(
-        #         request_output, verbose=self.log_requests)
-        
-
-        # return not self.engine.output_queue.empty()
-        return False
+        return scheduler_outputs_status
 
     async def _engine_abort(self, request_ids: Iterable[str]):
         if self.engine_use_ray:
             await self.engine.abort_request.remote(request_ids)  # type: ignore
         else:
             self.engine.abort_request(request_ids)
-
-    async def run_engine_loop(self):
-        has_requests_in_progress = False
-        
-        # asyncio.create_task(process_last_pp_request_output())
-        # async def process_last_pp_request_output():
             
-        
-        
+    async def process_last_pp_outputs(self):
         while True:
-            with open("master_output1.txt", "a") as f:
-                f.write("\n !!! Process PID is"+str(os.getpid()))
-                f.write("\n run_engine_loop while True has_requests_in_progress\n" + str(has_requests_in_progress) + "\n")
-                f.flush()  # 确保内容被写入到文件
-            if not has_requests_in_progress:
+            if self.engine.output_queue.empty():
+                self.has_requests_in_pp3_progress = False
+                break
+            request_output = await self.engine.output_queue.get()
+            self.has_requests_in_pp3_progress = True
+            # 处理 request_output
+            logger.debug("Start process_last_pp_outputs")
+            self._request_tracker.process_request_output(request_output, verbose=self.log_requests)
+            logger.debug("Finish process_last_pp_outputs, self.has_requests_in_pp3_progress = " + str(self.has_requests_in_pp3_progress))
+            self.engine.scheduler.put_back_pp3_seq_groups(request_output.request_id)
+            logger.debug("Finish self.engine.scheduler.put_back_pp3_seq_groups " + str(request_output.request_id))
+            self._request_tracker.new_requests_event.set()
+            logger.debug("new_requests_event.set()")
+            
+    async def continuous_process_last_pp_logits(self):
+        while True:
+            try:
+                await self.engine.process_last_pp_logits()
+            except Exception as e:
+                logger.debug("Error in process_last_pp_logits: "+ str(e))
+                continue
+            await asyncio.sleep(0)
+
+    async def continuous_process_last_pp_outputs(self):
+        while True:
+            await self.process_last_pp_outputs()
+            await asyncio.sleep(0)
+
+    async def run_engine_loop(self): 
+        # 启动持续任务
+        asyncio.create_task(self.continuous_process_last_pp_logits())
+        asyncio.create_task(self.continuous_process_last_pp_outputs())
+        
+        has_requests_in_pp0_progress = False
+        while True:           
+            logger.debug("self.has_requests_in_pp3_progress " + str(self.has_requests_in_pp3_progress) + " has_requests_in_pp0_progress " + str(has_requests_in_pp0_progress))
+            logger.debug("self._request_tracker._new_requests"+str(self._request_tracker._new_requests))
+            logger.debug("self._request_tracker._new_requests empty 1"+str(self._request_tracker._new_requests.empty()))
+            # if not self.has_requests_in_pp3_progress and not has_requests_in_pp0_progress:
+            if not has_requests_in_pp0_progress:
+                logger.debug("self._request_tracker._new_requests empty 2"+str(self._request_tracker._new_requests.empty()))
                 logger.debug("Waiting for new requests...")
-                print("Waiting for new requests...")
-                with open("master_output1.txt", "a") as f:
-                    f.write("Waiting for new requests...\n")
-                    f.flush()  # 确保内容被写入到文件
                 await self._request_tracker.wait_for_new_requests()
                 logger.debug("Got new requests!")
-                with open("master_output1.txt", "a") as f:
-                    f.write("\n Got new requests!\n")
-                    f.flush()  # 确保内容被写入到文件
 
             # Abort if iteration takes too long due to unrecoverable errors
             # (eg. NCCL timeouts).
             try:
-                with open("master_output1.txt", "a") as f:
-                    f.write("\n call engine step \n")
-                    f.flush()  # 确保内容被写入到文件
-
-                has_requests_in_progress = await asyncio.wait_for(
-                    self.engine_step(), ENGINE_ITERATION_TIMEOUT_S)
-            
-                
-                logger.info("in run_engine_loop, engine_step returned.")
-                
-                with open("master_output1.txt", "a") as f:
-                    f.write("\n in run_engine_loop, engine_step returned.\n")
-                    f.write(str(has_requests_in_progress))
-                    f.flush()  # 确保内容被写入到文件
-                
-                with open("master_output1.txt", "a") as f:
-                    f.write("\n asyncio.create_task(self.engine.process_last_pp_logits()) 1 \n")
-                    f.flush()  # 确保内容被写入到文件
-                    
-                    
+                has_requests_in_pp0_progress = await asyncio.wait_for(self.engine_step(), ENGINE_ITERATION_TIMEOUT_S)
+                # await asyncio.wait_for(self.engine_step(), ENGINE_ITERATION_TIMEOUT_S)
+                logger.debug("Finish asyncio.wait_for self.engine_step(), has_requests_in_pp0_progress= "+str(has_requests_in_pp0_progress))
             except asyncio.TimeoutError as exc:
                 logger.error(
                     "Engine iteration timed out. This should never happen!")
-                with open("master_output1.txt", "a") as f:
-                    f.write("\n Engine iteration timed out. This should never happen! \n")
                 self.set_errored(exc)
                 raise
-            except Exception as exc:
-                with open("master_output1.txt", "a") as f:
-                    f.write(f"\n in run_engine_loop, engine_step raised an exception: {str(exc)}\n")
-                    f.flush()  # 确保内容被写入到文件
-            
-            with open("master_output1.txt", "a") as f:
-                    f.write("\n asyncio.create_task(self.engine.process_last_pp_logits()) 2 \n")
-                    f.flush()  # 确保内容被写入到文件
-                    
-            asyncio.create_task(self.engine.process_last_pp_logits())
-            
             await asyncio.sleep(0)
-            
-            with open("master_output1.txt", "a") as f:
-                    f.write("\n asyncio.create_task(self.engine.process_last_pp_logits()) 3 \n")
-                    f.flush()  # 确保内容被写入到文件
-                    
-            while True:
-                with open("master_output1.txt", "a") as f:
-                    f.write("\n run engine loop while True\n")
-                    f.flush()  # 确保内容被写入到文件
-                if self.engine.output_queue.empty():
-                    break
-                request_output = await self.engine.output_queue.get()
-                has_requests_in_progress = True
-                with open("master_output1.txt", "a") as f:
-                    output_string = "\n engine_step request_outputs " + str(request_output) + "\n"
-                    f.write(output_string)
-                    f.write("has_requests_in_progress" + str(has_requests_in_progress) +"\n")
-                    f.flush()  # 确保内容被写入到文件
-                # 处理 request_output
-                self._request_tracker.process_request_output(
-                    request_output, verbose=self.log_requests)
-
-                with open("master_output1.txt", "a") as f:
-                    f.write("\n engine step return not self.engine.output_queue.empty()\n")
-                    f.write("self.engine.output_queue "+str(self.engine.output_queue)+"\n")
-                    f.flush()  # 确保内容被写入到文件
-                    
-                logger.info("in engine_step, engine_step returned." + str(not self.engine.output_queue.empty()))
-            
-
-            
             
 
     async def add_request(
